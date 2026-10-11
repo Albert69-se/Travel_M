@@ -168,7 +168,7 @@ function provenanceBlock(place) {
 function mapPlaceholder(context) {
   return el('div', { className: 'map-placeholder' }, [
     el('p', { className: 'label', text: 'MAP PLACEHOLDER' }),
-    el('p', { text: `Map provider is not connected, so ${context} cannot be shown on a map.` }),
+    el('p', { text: `No map provider is configured for this prototype, so ${context} cannot be shown on a map.` }),
   ]);
 }
 
@@ -281,7 +281,7 @@ function renderHome() {
       el('p', {
         text: isMember()
           ? 'Pick up your trip, check the budget, and keep planning.'
-          : 'Browse sample places first. Log in with the demo account to plan a trip, track a budget, and keep a packing list.',
+          : 'Browse sample places first. Log in or create an account to plan a trip, track a budget, and keep a packing list.',
       }),
     ]),
   ];
@@ -320,11 +320,12 @@ function renderHome() {
   } else {
     nodes.push(
       panel('Weather status', [
-        el('p', { text: 'Weather provider is not connected. No conditions or temperature are shown.' }),
+        el('p', { text: 'Weather is shown for the destination and dates of a trip, so it appears once you have a trip to plan.' }),
       ]),
       panel('Continue planning', [
-        el('p', { text: 'Sign in with the demo account to create trips, budgets, and packing lists.' }),
-        button('Log in with demo account', 'auth:demologin', 'primary'),
+        el('p', { text: 'Log in or create an account to keep trips, budgets, and packing lists. The demo account already has a sample trip.' }),
+        button('Log in', 'login:open', 'primary'),
+        button('Log in with demo account', 'auth:demologin'),
       ]),
     );
   }
@@ -414,7 +415,7 @@ function renderPlaceDetails() {
         memberTrips.length === 0 ? null : el('div', { className: 'actions' }, [el('button', { text: 'Add to itinerary', attrs: { type: 'submit' } })]),
         errorFor('form'),
       ])
-    : el('p', { className: 'hint', text: 'Log in with the demo account to add this place to a trip.' });
+    : el('p', { className: 'hint', text: 'Log in or create an account to add this place to a trip.' });
 
   return [
     el('section', { className: 'panel hero' }, [

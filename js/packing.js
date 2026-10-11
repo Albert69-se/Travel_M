@@ -56,9 +56,14 @@ export function suggestPackingItems(packing, tripId, suggestedNames = DEFAULT_PA
   return [...(Array.isArray(packing) ? packing : []), ...additions];
 }
 
-/** Suggestions are not weather-based until a forecast is actually available. */
+/**
+ * The suggestions are a fixed standard list, not derived from trip context.
+ * `weatherAvailable` reports whether a forecast exists, so the traveller can see
+ * how much context the list was built from — never more than it actually has.
+ */
 export function describeSuggestionSource(weatherAvailable) {
+  const base = 'Standard suggestions, the same for every trip — not yet tailored to the destination, dates, or activities.';
   return weatherAvailable
-    ? 'Suggestions drafted from trip dates, destination and available weather.'
-    : 'Suggestions are not weather-based until a forecast is available.';
+    ? `${base} A forecast is available, but these items are not based on it.`
+    : `${base} No forecast is available for these dates.`;
 }

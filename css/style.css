@@ -1,0 +1,435 @@
+/* Travel M — low-fidelity prototype styling.
+   Deliberately plain: grey surfaces, hairline borders, readable labels.
+   No decorative colour is used to carry meaning, so status is always written out. */
+
+:root {
+  --line: #c9c9c9;
+  --line-strong: #8d8d8d;
+  --surface: #f4f4f4;
+  --surface-2: #ebebeb;
+  --text: #1c1c1c;
+  --muted: #5c5c5c;
+  --warning: #7a3b00;
+  --danger: #8a1c1c;
+  --ok: #1f4d2b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.wrap {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  padding: 0.5rem 0.75rem;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  z-index: 10;
+}
+
+/* ---------------------------------------------------------------- header -- */
+
+.app-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.brand {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.brand-note {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.nav-link,
+.tab,
+.chip,
+button {
+  font: inherit;
+}
+
+.nav-link,
+.tab,
+.chip {
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+
+.nav-link-active,
+.tab-active,
+.chip-active {
+  border-color: var(--line-strong);
+  border-width: 2px;
+  font-weight: 700;
+}
+
+.session-bar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.session-name {
+  border-left: 1px solid var(--line);
+  padding-left: 0.5rem;
+}
+
+/* ------------------------------------------------------------- sections -- */
+
+main {
+  display: block;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+main:focus {
+  outline: none;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.panel h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.panel h3 {
+  margin: 0.4rem 0 0.2rem;
+  font-size: 0.95rem;
+}
+
+.hero {
+  background: #fff;
+  border-width: 2px;
+}
+
+.hero h2 {
+  font-size: 1.2rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.metric {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0.2rem 0;
+}
+
+.label {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+}
+
+.hint,
+.fineprint {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.notice {
+  border-left: 3px solid var(--line-strong);
+  padding-left: 0.6rem;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------- forms/lists -- */
+
+.field {
+  display: block;
+  margin: 0 0 0.7rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+input,
+select {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  width: 100%;
+  max-width: 26rem;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 1px;
+}
+
+.error {
+  display: block;
+  color: var(--danger);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.error::before {
+  content: "Error: ";
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.actions button,
+form button {
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+/* ------------------------------------------------------------- results -- */
+
+.result-list,
+.trip-list,
+.day-list,
+.packing-list,
+.info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.result {
+  display: flex;
+  gap: 0.75rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0.7rem;
+  margin-bottom: 0.6rem;
+}
+
+.result-image {
+  width: 4rem;
+  min-width: 4rem;
+  height: 5rem;
+  border: 1px dashed var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.result-body {
+  flex: 1;
+}
+
+.result h3 {
+  margin-top: 0;
+}
+
+.trip-card,
+.day-item,
+.packing-item {
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0.7rem;
+  margin-bottom: 0.6rem;
+}
+
+.packing-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.packing-item input {
+  width: auto;
+  max-width: none;
+}
+
+.packing-item label {
+  flex: 1;
+}
+
+.info-list li {
+  display: flex;
+  gap: 0.6rem;
+  border-bottom: 1px dotted var(--line);
+  padding: 0.3rem 0;
+}
+
+.info-list strong {
+  min-width: 9rem;
+}
+
+/* ------------------------------------------------------------ statuses -- */
+
+.status {
+  font-weight: 700;
+  border-left: 4px solid var(--line-strong);
+  padding-left: 0.5rem;
+}
+
+.status-over {
+  border-left-color: var(--danger);
+  color: var(--danger);
+}
+
+.status-nearing {
+  border-left-color: var(--warning);
+  color: var(--warning);
+}
+
+.status-ok {
+  border-left-color: var(--ok);
+  color: var(--ok);
+}
+
+.status-unavailable {
+  border-left-color: var(--muted);
+  color: var(--muted);
+}
+
+.provenance {
+  border: 1px dashed var(--line-strong);
+  padding: 0.5rem 0.7rem;
+  margin-top: 0.6rem;
+}
+
+.map-placeholder {
+  border: 1px dashed var(--line-strong);
+  background: repeating-linear-gradient(45deg, #fafafa, #fafafa 8px, #f0f0f0 8px, #f0f0f0 16px);
+  padding: 1rem;
+  margin-bottom: 0.9rem;
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.9rem;
+}
+
+/* --------------------------------------------------------------- table -- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.table caption {
+  text-align: left;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-bottom: 0.3rem;
+  color: var(--muted);
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--line);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+/* ---------------------------------------------------- wider breakpoints -- */
+
+@media (min-width: 1024px) {
+  main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0.9rem;
+    align-items: start;
+  }
+
+  main > * {
+    grid-column: 1 / -1;
+  }
+
+  main > .hero,
+  main > .panel {
+    grid-column: auto;
+  }
+
+  main > .panel:first-of-type {
+    grid-column: 1 / -1;
+  }
+}

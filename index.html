@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Travel M — low-fidelity trip planner prototype</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#view">Skip to main content</a>
+
+    <div id="app">
+      <header class="app-header">
+        <div class="wrap header-inner">
+          <p class="brand">Travel M</p>
+          <p class="brand-note">MENU · DEMO</p>
+          <nav id="nav" class="nav" aria-label="Main"></nav>
+          <div id="session-bar" class="session-bar"></div>
+        </div>
+      </header>
+
+      <main id="view" class="wrap" tabindex="-1"></main>
+
+      <footer class="app-footer">
+        <div class="wrap">
+          <p class="fineprint">LOW-FIDELITY PROTOTYPE · SAMPLE DATA — NOT LIVE VERIFIED</p>
+          <p id="status-line" class="status-line" role="status" aria-live="polite"></p>
+          <p>
+            <button type="button" data-action="reset:data">Reset sample data</button>
+          </p>
+          <p class="fineprint">
+            Stored locally in this browser only. No accounts, no server, no shared data.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+# dependencies and virtual environments
+node_modules/
+.venv/
+venv/
+
+# local environment and credentials
+.env
+.env.*
+!.env.example
+
+# generated output
+dist/
+build/
+.next/
+coverage/
+
+# operating system and editors
+.DS_Store
+.idea/
+.vscode/
+
+# logs and temporary document QA files
+*.log
+~$*.docx
+

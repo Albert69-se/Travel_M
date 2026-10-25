@@ -1,0 +1,16 @@
+[Unit]
+Description=Cloudflare Tunnel for Travel M (React)
+After=network-online.target travel-m-react.service
+Wants=network-online.target travel-m-react.service
+
+[Service]
+Type=simple
+ExecStart=/home/opc/bin/cloudflared tunnel --config /home/opc/.cloudflared/travel-m.yml --no-autoupdate run
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=default.target

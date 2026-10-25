@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Travel M — Trip Planner Dashboard</title>
+<!-- Material Symbols Outlined font -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "background": "#f9f9ff",
+            "on-secondary": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-variant": "#e2e2e8",
+            "tertiary-fixed": "#ffdbcc",
+            "secondary": "#5b5e6a",
+            "error-container": "#ffdad6",
+            "on-primary-container": "#dad7ff",
+            "on-tertiary": "#ffffff",
+            "on-secondary-container": "#5f626f",
+            "on-surface-variant": "#464555",
+            "surface-dim": "#d9d9df",
+            "on-secondary-fixed": "#181b26",
+            "outline-variant": "#c7c4d8",
+            "secondary-container": "#dddfee",
+            "surface-container-low": "#f3f3f9",
+            "on-tertiary-container": "#ffd2be",
+            "on-tertiary-fixed": "#351000",
+            "primary": "#3525cd",
+            "tertiary-container": "#a44100",
+            "primary-fixed-dim": "#c3c0ff",
+            "outline": "#777587",
+            "on-background": "#1a1c20",
+            "surface": "#f9f9ff",
+            "on-secondary-fixed-variant": "#434652",
+            "tertiary": "#7e3000",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-fixed-variant": "#3323cc",
+            "surface-container-high": "#e8e8ed",
+            "tertiary-fixed-dim": "#ffb695",
+            "secondary-fixed": "#e0e2f0",
+            "surface-tint": "#4d44e3",
+            "surface-bright": "#f9f9ff",
+            "on-error": "#ffffff",
+            "on-surface": "#1a1c20",
+            "secondary-fixed-dim": "#c3c6d4",
+            "on-tertiary-fixed-variant": "#7b2f00",
+            "surface-container-highest": "#e2e2e8",
+            "inverse-on-surface": "#f0f0f6",
+            "primary-container": "#4f46e5",
+            "inverse-surface": "#2f3035",
+            "primary-fixed": "#e2dfff",
+            "surface-container": "#ededf3",
+            "inverse-primary": "#c3c0ff",
+            "on-primary-fixed": "#0f0069",
+            "on-error-container": "#93000a",
+            "on-primary": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xl": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter-sm": "0.5rem",
+            "space-lg": "1rem",
+            "margin": "1.5rem",
+            "margin-mobile": "1rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem"
+          },
+          "fontFamily": {
+            "title-md": ["Inter"],
+            "body-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "label-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "code-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "headline-sm": ["Inter"]
+          },
+          "fontSize": {
+            "title-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "body-md": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "code-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #F7F8FA;
+      color: #0F1115;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-card-shadow {
+      box-shadow: 0 1px 2px 0 rgba(15, 17, 21, 0.04);
+    }
+  </style>
+</head>
+<body class="bg-[#F7F8FA] min-h-screen text-[#0F1115] flex">
+<!-- SideNavBar Component -->
+<aside class="fixed top-0 left-0 h-screen w-[228px] shrink-0 bg-surface-container-lowest border-r border-[#E8E9ED] z-30 flex flex-col justify-between p-3 select-none">
+<!-- Top Block: Brand + Primary + Secondary Nav -->
+<div class="flex flex-col gap-4">
+<!-- Brand Header -->
+<div class="flex items-center gap-2.5 px-2 py-2">
+<div class="w-7 h-7 rounded-lg bg-[#EEF0FF] flex items-center justify-center text-[#4F46E5] shrink-0">
+<span class="material-symbols-outlined text-[18px]">explore</span>
+</div>
+<div class="flex flex-col">
+<span class="text-headline-sm font-headline-sm text-on-surface tracking-tight leading-tight">Voyager</span>
+<span class="text-label-sm font-label-sm text-secondary leading-none">Productivity Trip Planner</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-0.5">
+<!-- Top Group -->
+<a class="relative flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container-low text-primary font-title-md before:content-[''] before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-1 before:bg-primary before:rounded-r transition-all duration-150 ease-in-out cursor-pointer" href="#home">
+<span class="material-symbols-outlined text-[18px]">home</span>
+<span class="text-title-md font-title-md">Home</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors duration-150 ease-in-out cursor-pointer" href="#discover">
+<span class="material-symbols-outlined text-[18px]">explore</span>
+<span class="text-body-md font-body-md">Discover</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors duration-150 ease-in-out cursor-pointer" href="#saved-places">
+<span class="material-symbols-outlined text-[18px]">bookmark</span>
+<span class="text-body-md font-body-md">Saved Places</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors duration-150 ease-in-out cursor-pointer" href="#my-trips">
+<span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
+<span class="text-body-md font-body-md">My Trips</span>
+</a>
+<!-- Subheader Section -->
+<div class="pt-4 pb-1 px-3">
+<span class="text-[11px] font-semibold tracking-wider text-[#9AA0AC]">TRIP</span>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors duration-150 ease-in-out cursor-pointer" href="#itinerary">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="text-body-md font-body-md">Itinerary</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors duration-150 ease-in-out cursor-pointer" href="#packing">
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+<span class="text-body-md font-body-md">Packing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors duration-150 ease-in-out cursor-pointer" href="#expenses">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+<span class="text-body-md font-body-md">Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors duration-150 ease-in-out cursor-pointer" href="#weather">
+<span class="material-symbols-outlined text-[18px]">wb_sunny</span>
+<span class="text-body-md font-body-md">Weather</span>
+</a>
+</nav>
+</div>
+<!-- Bottom Footer Profile and Actions -->
+<div class="pt-3 border-t border-[#E8E9ED] flex flex-col gap-1.5">
+<div class="flex items-center justify-between p-2 rounded-lg bg-[#F7F8FA]">
+<div class="flex items-center gap-2.5 overflow-hidden">
+<div class="w-8 h-8 rounded-full bg-[#EEF0FF] text-[#4F46E5] flex items-center justify-center font-title-md text-xs shrink-0 font-semibold">
+            AL
+          </div>
+<div class="flex flex-col min-w-0">
+<span class="text-title-md font-title-md text-[#0F1115] truncate">Alex Morgan</span>
+<span class="text-[11px] text-[#9AA0AC] leading-tight">Demo account</span>
+</div>
+</div>
+<button class="text-secondary hover:text-error transition-colors p-1" title="Log Out" type="button">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+<div class="flex items-center justify-between px-2 pt-1 text-label-sm font-label-sm text-[#9AA0AC]">
+<a class="flex items-center gap-1.5 hover:text-[#0F1115] transition-colors" href="#settings">
+<span class="material-symbols-outlined text-[16px]">settings</span>
+<span>Settings</span>
+</a>
+<span>v1.4.2</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Layout (Offset for fixed 228px sidebar) -->
+<main class="ml-[228px] flex-1 min-h-screen bg-[#F7F8FA] p-6 flex justify-center">
+<div class="w-full max-w-[1040px] flex flex-col gap-6">
+<!-- Header Row -->
+<header class="flex items-center justify-between gap-4">
+<div>
+<h1 class="text-[28px] leading-8 font-semibold tracking-[-0.02em] text-[#0F1115]">Good morning, Alex</h1>
+<p class="text-[13px] leading-[18px] text-[#5B616E] mt-0.5">Next trip in 27 days</p>
+</div>
+<div class="flex items-center gap-3">
+<!-- Segmented View Toggle -->
+<div class="h-[34px] p-0.5 bg-[#E8E9ED] rounded-lg flex items-center">
+<button class="h-[30px] px-3 bg-white text-[#0F1115] text-[13px] font-medium rounded-md shadow-sm border border-[#E8E9ED] flex items-center gap-1">
+<span>Overview</span>
+</button>
+<button class="h-[30px] px-3 text-[#5B616E] hover:text-[#0F1115] text-[13px] font-medium rounded-md transition-colors flex items-center gap-1">
+<span>Itinerary</span>
+</button>
+</div>
+<!-- CTA Button -->
+<button class="h-[34px] px-3.5 bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] text-white rounded-[10px] text-[13px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>+ New trip</span>
+</button>
+</div>
+</header>
+<!-- Hero Trip Card (Split 60/40, exactly 240px tall) -->
+<div class="h-[240px] w-full rounded-xl bg-white border border-[#E8E9ED] custom-card-shadow overflow-hidden flex flex-row">
+<!-- Left Hero Thumbnail (60%) -->
+<div class="w-[60%] h-full relative overflow-hidden flex flex-col justify-between p-5">
+<img alt="Chiang Mai Mountain Temple" class="absolute inset-0 w-full h-full object-cover z-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp1I31OCYjj3Xc3vco-D1nbxnKiI5C3zkxwf3t_qOQ-lArtkQAtm8syPrQyAbDVpJzKxEcvTCNr3YYnPhibfBYqsr8XmohGL9TMGb2Oa0VJ0R6a9xMFtg1lfmsNSlmMtnR9_IXA_H0kWZ8KahdPTGAJ7ZX7R1iznN2hlfUDzRniqZZMK0Suwcwu9BNjrB22pGzobFK0TLy9QP4TnfSoZzmFUU-9c-R2QatSXiN79-7tSu7Ndu7tRtGNYTTzkmY00h1ol5uYzXvZ69y"/>
+<!-- Scrim Overlay -->
+<div class="absolute inset-0 z-10 pointer-events-none" style="background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.2) 100%);"></div>
+<!-- Top Row Status Pill -->
+<div class="relative z-20 flex items-center justify-between">
+<span class="h-[26px] inline-flex items-center px-2.5 rounded-full text-xs font-medium text-white bg-white/20 border border-white/30 tracking-tight">
+              Confirmed
+            </span>
+<span class="text-xs text-white/90 font-medium tracking-wide">TH-50</span>
+</div>
+<!-- Bottom Row Trip Meta -->
+<div class="relative z-20 flex flex-col gap-1">
+<div class="text-[11px] font-semibold text-white/80 uppercase tracking-wider">Upcoming Destination</div>
+<h2 class="text-[22px] font-semibold text-white leading-tight">Chiang Mai</h2>
+<div class="flex items-center gap-3 text-xs text-white/90">
+<span class="font-medium">12 – 15 Nov 2026</span>
+<span class="w-1 h-1 rounded-full bg-white/60"></span>
+<span class="text-white/80">4 days · 3 nights</span>
+</div>
+</div>
+</div>
+<!-- Right Data Panel (40%) -->
+<div class="w-[40%] h-full bg-white flex flex-col justify-between p-4 border-l border-[#E8E9ED]">
+<!-- Stat 1: Budget -->
+<div class="flex flex-col justify-center flex-1 pb-2 border-b border-[#E8E9ED]">
+<span class="text-[11px] font-semibold text-[#9AA0AC] uppercase tracking-[0.06em]">BUDGET</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="text-[15px] font-semibold text-[#0F1115]">THB 5,000</span>
+<span class="text-[11px] text-[#5B616E]">Allocated cap</span>
+</div>
+</div>
+<!-- Stat 2: Spent with progress bar -->
+<div class="flex flex-col justify-center flex-1 py-2 border-b border-[#E8E9ED]">
+<div class="flex items-baseline justify-between mb-1.5">
+<span class="text-[11px] font-semibold text-[#9AA0AC] uppercase tracking-[0.06em]">SPENT</span>
+<span class="text-[15px] font-semibold text-[#0F1115]">THB 1,950</span>
+</div>
+<!-- Progress bar -->
+<div class="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+<div class="h-full bg-[#F59E0B] rounded-full" style="width: 39%;"></div>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="text-[11px] text-[#5B616E]">Flight &amp; deposit</span>
+<span class="text-[11px] font-medium text-[#F59E0B]">39%</span>
+</div>
+</div>
+<!-- Stat 3: Remaining -->
+<div class="flex flex-col justify-center flex-1 pt-2">
+<span class="text-[11px] font-semibold text-[#9AA0AC] uppercase tracking-[0.06em]">REMAINING</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="text-[15px] font-semibold text-[#16A34A]">THB 3,050</span>
+<span class="text-[11px] text-[#16A34A] bg-[#DCFCE7] px-1.5 py-0.5 rounded font-medium">On track</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 3-Column Compact Stat Cards -->
+<div class="grid grid-cols-3 gap-4">
+<!-- Stat Card 1 -->
+<div class="bg-white rounded-xl border border-[#E8E9ED] p-4 custom-card-shadow flex flex-col justify-between h-[104px]">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-semibold text-[#9AA0AC] uppercase tracking-[0.06em]">SAVED PLACES</span>
+<span class="material-symbols-outlined text-[#9AA0AC] text-[18px]">bookmark</span>
+</div>
+<div>
+<div class="text-[24px] font-semibold text-[#0F1115] leading-none">8</div>
+<p class="text-[12px] text-[#5B616E] mt-1">2 added this week</p>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-white rounded-xl border border-[#E8E9ED] p-4 custom-card-shadow flex flex-col justify-between h-[104px]">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-semibold text-[#9AA0AC] uppercase tracking-[0.06em]">PACKING</span>
+<span class="material-symbols-outlined text-[#9AA0AC] text-[18px]">inventory_2</span>
+</div>
+<div>
+<div class="flex items-baseline justify-between mb-1.5">
+<span class="text-[20px] font-semibold text-[#0F1115] leading-none">3 / 5 packed</span>
+<span class="text-[11px] font-medium text-[#4F46E5]">60%</span>
+</div>
+<div class="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+<div class="h-full bg-[#4F46E5] rounded-full" style="width: 60%;"></div>
+</div>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-white rounded-xl border border-[#E8E9ED] p-4 custom-card-shadow flex flex-col justify-between h-[104px]">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-semibold text-[#9AA0AC] uppercase tracking-[0.06em]">ACTIVITIES</span>
+<span class="material-symbols-outlined text-[#9AA0AC] text-[18px]">calendar_month</span>
+</div>
+<div>
+<div class="text-[24px] font-semibold text-[#0F1115] leading-none">6</div>
+<p class="text-[12px] text-[#5B616E] mt-1">All days planned</p>
+</div>
+</div>
+</div>
+<!-- Two-Column Lower Section: Today's Plan (65%) + Weather (35%) -->
+<div class="grid grid-cols-12 gap-4">
+<!-- Left: Today's Plan (~65% -> 8 columns) -->
+<section class="col-span-8 bg-white rounded-xl border border-[#E8E9ED] p-4 custom-card-shadow flex flex-col justify-between">
+<div>
+<!-- Section Header -->
+<div class="flex items-center justify-between pb-3 border-b border-[#E8E9ED]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#4F46E5] text-[18px]">event_note</span>
+<h3 class="text-[15px] font-semibold text-[#0F1115]">Today's plan</h3>
+</div>
+<span class="text-[11px] text-[#9AA0AC] font-normal">Sample data — not verified</span>
+</div>
+<!-- List rows (each standardized ~44px boundary) -->
+<div class="flex flex-col">
+<!-- Item 1 -->
+<div class="h-[44px] flex items-center justify-between px-1 border-b border-[#E8E9ED] hover:bg-[#F7F8FA] transition-colors">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-7 h-7 rounded bg-[#EEF0FF] text-[#4F46E5] font-semibold text-[11px] flex items-center justify-center shrink-0">
+                    D1
+                  </div>
+<span class="text-[13px] font-medium text-[#0F1115] truncate">Wat Phra That Doi Suthep</span>
+<span class="text-[12px] text-[#9AA0AC] shrink-0">09:00 – 11:30</span>
+</div>
+<span class="text-[11px] font-medium text-[#5B616E] bg-[#F7F8FA] border border-[#E8E9ED] px-2 py-0.5 rounded-full shrink-0 ml-2">
+                  2h 30m
+                </span>
+</div>
+<!-- Item 2 -->
+<div class="h-[44px] flex items-center justify-between px-1 border-b border-[#E8E9ED] hover:bg-[#F7F8FA] transition-colors">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-7 h-7 rounded bg-[#EEF0FF] text-[#4F46E5] font-semibold text-[11px] flex items-center justify-center shrink-0">
+                    D1
+                  </div>
+<span class="text-[13px] font-medium text-[#0F1115] truncate">Khao Soi Lunch at Nimman</span>
+<span class="text-[12px] text-[#9AA0AC] shrink-0">12:15 – 13:30</span>
+</div>
+<span class="text-[11px] font-medium text-[#5B616E] bg-[#F7F8FA] border border-[#E8E9ED] px-2 py-0.5 rounded-full shrink-0 ml-2">
+                  1h 15m
+                </span>
+</div>
+<!-- Item 3 -->
+<div class="h-[44px] flex items-center justify-between px-1 hover:bg-[#F7F8FA] transition-colors">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-7 h-7 rounded bg-[#EEF0FF] text-[#4F46E5] font-semibold text-[11px] flex items-center justify-center shrink-0">
+                    D1
+                  </div>
+<span class="text-[13px] font-medium text-[#0F1115] truncate">Old City Gate &amp; Walking Street</span>
+<span class="text-[12px] text-[#9AA0AC] shrink-0">16:00 – 18:30</span>
+</div>
+<span class="text-[11px] font-medium text-[#5B616E] bg-[#F7F8FA] border border-[#E8E9ED] px-2 py-0.5 rounded-full shrink-0 ml-2">
+                  2h 30m
+                </span>
+</div>
+</div>
+</div>
+<!-- Bottom Action Helper -->
+<div class="pt-2 border-t border-[#E8E9ED] flex items-center justify-between text-[12px]">
+<span class="text-[#5B616E]">3 activities scheduled for arrival day</span>
+<a class="text-[#4F46E5] font-medium hover:underline flex items-center gap-1" href="#itinerary">
+<span>View full schedule</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</section>
+<!-- Right: Weather in Chiang Mai (~35% -> 4 columns) -->
+<section class="col-span-4 bg-white rounded-xl border border-[#E8E9ED] p-4 custom-card-shadow flex flex-col justify-between">
+<!-- Top Weather Summary -->
+<div>
+<div class="flex items-center justify-between pb-2 border-b border-[#E8E9ED]">
+<h3 class="text-[15px] font-semibold text-[#0F1115]">Weather in Chiang Mai</h3>
+<span class="material-symbols-outlined text-[#9AA0AC] text-[18px]">thermostat</span>
+</div>
+<!-- Current Temp Display -->
+<div class="flex items-center justify-between py-3">
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="text-[32px] font-semibold text-[#0F1115] leading-none tracking-tight">31°</span>
+<span class="text-[13px] text-[#5B616E] font-medium">Partly cloudy</span>
+</div>
+<span class="text-[11px] text-[#9AA0AC] mt-1">Open-Meteo · updated 5 min ago</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-[#F7F8FA] border border-[#E8E9ED] flex items-center justify-center text-[#5B616E]">
+<span class="material-symbols-outlined text-[22px]">partly_cloudy_day</span>
+</div>
+</div>
+</div>
+<!-- Horizontal 4-Day Forecast Grid -->
+<div class="grid grid-cols-4 border-t border-[#E8E9ED] pt-3 text-center">
+<!-- Thu -->
+<div class="flex flex-col items-center gap-1.5 pr-1">
+<span class="text-[11px] font-medium text-[#5B616E]">Thu</span>
+<span class="material-symbols-outlined text-[18px] text-[#5B616E]">cloud</span>
+<span class="text-[11px] font-semibold text-[#0F1115]">31° / 21°</span>
+</div>
+<!-- Fri -->
+<div class="flex flex-col items-center gap-1.5 px-1 border-l border-[#E8E9ED]">
+<span class="text-[11px] font-medium text-[#5B616E]">Fri</span>
+<span class="material-symbols-outlined text-[18px] text-[#F59E0B]">wb_sunny</span>
+<span class="text-[11px] font-semibold text-[#0F1115]">32° / 22°</span>
+</div>
+<!-- Sat -->
+<div class="flex flex-col items-center gap-1.5 px-1 border-l border-[#E8E9ED]">
+<span class="text-[11px] font-medium text-[#5B616E]">Sat</span>
+<span class="material-symbols-outlined text-[18px] text-[#5B616E]">partly_cloudy_day</span>
+<span class="text-[11px] font-semibold text-[#0F1115]">30° / 21°</span>
+</div>
+<!-- Sun -->
+<div class="flex flex-col items-center gap-1.5 pl-1 border-l border-[#E8E9ED]">
+<span class="text-[11px] font-medium text-[#5B616E]">Sun</span>
+<span class="material-symbols-outlined text-[18px] text-[#4F46E5]">rainy</span>
+<span class="text-[11px] font-semibold text-[#0F1115]">29° / 20°</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</body></html>

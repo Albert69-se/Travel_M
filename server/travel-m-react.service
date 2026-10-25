@@ -1,0 +1,14 @@
+[Unit]
+Description=Travel M (React) static site
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/opc/apps/travel-m-react
+ExecStart=/usr/local/bin/node /home/opc/apps/travel-m-react/server/static-server.js 8802 /home/opc/apps/travel-m-react/dist
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

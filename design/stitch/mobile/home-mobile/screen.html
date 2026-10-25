@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel M - Home (mobile)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F7F8FA;
+      color: #0F1115;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 0;
+    }
+    .phone-frame {
+      width: 390px;
+      min-height: 844px;
+      background-color: #F7F8FA;
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 30px rgba(0,0,0,0.06);
+    }
+    /* Top Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: 52px;
+      background-color: #FFFFFF;
+      border-bottom: 1px solid #E8E9ED;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0F1115;
+      letter-spacing: -0.2px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 4px;
+      color: #5B616E;
+    }
+
+    /* Content Area */
+    .content {
+      padding: 16px 16px 72px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Greeting */
+    .greeting-section {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-top: 2px;
+    }
+    .greeting-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: #0F1115;
+      line-height: 1.25;
+      letter-spacing: -0.3px;
+    }
+    .greeting-sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: #5B616E;
+    }
+
+    /* Cards standard */
+    .card {
+      background-color: #FFFFFF;
+      border: 1px solid #E8E9ED;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(15, 17, 21, 0.04);
+      overflow: hidden;
+    }
+
+    /* Hero Trip Card */
+    .hero-photo-container {
+      position: relative;
+      height: 140px;
+      width: 100%;
+      background-color: #1a1e24;
+      overflow: hidden;
+    }
+    .hero-photo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%);
+      pointer-events: none;
+    }
+    .hero-status-badge {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      height: 20px;
+      padding: 0 8px;
+      background-color: #DCFCE7;
+      color: #16A34A;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-photo-text {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      color: #FFFFFF;
+    }
+    .hero-destination {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.2px;
+      color: #FFFFFF;
+    }
+    .hero-meta {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 2px;
+      font-weight: 400;
+    }
+
+    /* Budget rows */
+    .budget-rows {
+      display: flex;
+      flex-direction: column;
+    }
+    .budget-row {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid #E8E9ED;
+    }
+    .budget-row:last-child {
+      border-bottom: none;
+    }
+    .budget-label {
+      font-size: 13px;
+      color: #5B616E;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .budget-val-default {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0F1115;
+    }
+    .budget-val-spent {
+      font-size: 13px;
+      font-weight: 600;
+      color: #F59E0B;
+    }
+    .budget-val-remaining {
+      font-size: 13px;
+      font-weight: 600;
+      color: #16A34A;
+    }
+    .spent-bar-container {
+      width: 110px;
+      height: 6px;
+      background-color: #E8E9ED;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .spent-bar-fill {
+      width: 39%;
+      height: 100%;
+      background-color: #F59E0B;
+      border-radius: 999px;
+    }
+
+    /* Stat Tiles */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .stat-tile {
+      background-color: #FFFFFF;
+      border: 1px solid #E8E9ED;
+      border-radius: 12px;
+      padding: 10px 10px 10px 10px;
+      box-shadow: 0 1px 2px rgba(15, 17, 21, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 64px;
+    }
+    .stat-micro-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #9AA0AC;
+    }
+    .stat-number {
+      font-size: 20px;
+      font-weight: 600;
+      color: #0F1115;
+      line-height: 1.1;
+      margin-top: 4px;
+    }
+    .progress-bar-bg {
+      height: 4px;
+      background-color: #E8E9ED;
+      border-radius: 999px;
+      margin-top: 5px;
+      overflow: hidden;
+      width: 100%;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background-color: #4F46E5;
+      border-radius: 999px;
+      width: 60%;
+    }
+
+    /* Next Up Card */
+    .card-header-simple {
+      padding: 12px 14px 10px 14px;
+      border-bottom: 1px solid #E8E9ED;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0F1115;
+    }
+    .activity-row {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+      border-bottom: 1px solid #E8E9ED;
+    }
+    .activity-row:last-child {
+      border-bottom: none;
+    }
+    .day-chip {
+      height: 26px;
+      padding: 0 8px;
+      background-color: #EEF0FF;
+      color: #4F46E5;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .activity-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .activity-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #0F1115;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .activity-meta {
+      font-size: 12px;
+      color: #9AA0AC;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .activity-estimate {
+      font-size: 12px;
+      font-weight: 500;
+      color: #5B616E;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    /* Weather Card */
+    .weather-card {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .weather-top {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .weather-temp {
+      font-size: 20px;
+      font-weight: 600;
+      color: #0F1115;
+      line-height: 1;
+    }
+    .weather-desc {
+      font-size: 13px;
+      color: #5B616E;
+      font-weight: 400;
+    }
+    .forecast-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid #E8E9ED;
+      border-bottom: 1px solid #E8E9ED;
+      padding: 8px 0;
+    }
+    .forecast-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      border-right: 1px solid #E8E9ED;
+    }
+    .forecast-col:last-child {
+      border-right: none;
+    }
+    .forecast-day {
+      font-size: 11px;
+      color: #5B616E;
+      font-weight: 500;
+    }
+    .weather-footer-meta {
+      font-size: 11px;
+      color: #9AA0AC;
+      margin-top: -2px;
+    }
+
+    /* Disclaimer micro-line */
+    .disclaimer-text {
+      font-size: 11px;
+      color: #9AA0AC;
+      text-align: center;
+      padding: 0 4px;
+      margin-top: -4px;
+      margin-bottom: 4px;
+    }
+
+    /* Bottom Tab Bar */
+    .bottom-tab-bar {
+      position: fixed;
+      bottom: 0;
+      width: 390px;
+      height: 52px;
+      background-color: #FFFFFF;
+      border-top: 1px solid #E8E9ED;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 50;
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      text-decoration: none;
+      color: #9AA0AC;
+      flex: 1;
+      height: 100%;
+    }
+    .tab-item.active {
+      color: #4F46E5;
+    }
+    .tab-label {
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- (1) Top Bar -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <!-- 18px stroked line compass icon in indigo #4F46E5 -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+        <span class="brand-text">Travel M</span>
+      </div>
+      <button class="icon-btn" aria-label="Notifications">
+        <!-- 18px stroked line bell icon in #5B616E -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B616E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Main Content Area (padding 16px horizontal) -->
+    <main class="content">
+      <!-- (2) Greeting Section -->
+      <section class="greeting-section">
+        <h1 class="greeting-title">Good morning, Alex</h1>
+        <p class="greeting-sub">Next trip in 27 days</p>
+      </section>
+
+      <!-- (3) Hero Trip Card -->
+      <section class="card">
+        <div class="hero-photo-container">
+          <img src="https://lh3.googleusercontent.com/aida/AEtjO1X-cxYtR4jK2x1oOmXmRp7gwJ2XmVGIrHnW05QVPY_fvi7I3pO3xQvl7Msl-GIvHXAzltccSWCnAVDFnIN-e8ENHOFi6zsP_d8iUmHxY0uls8Y1IW-BZTimK-wpi03kmLZiNtMPq1QO0qu024Mje4lz17-QCzLJOkwuOEuVRqVEp8D-V9672VO4vaT6hO-PEzvbYS9UD91ufiw5ajXHOk4iVKUtN69nZouH60Ts4UicqQuJdN7AR1AqIEE" alt="Wat Phra That Doi Suthep Chiang Mai">
+          <div class="hero-scrim"></div>
+          <div class="hero-status-badge">Confirmed</div>
+          <div class="hero-photo-text">
+            <div class="hero-destination">Chiang Mai</div>
+            <div class="hero-meta">12 - 15 Nov 2026 &bull; 4 days - 3 nights</div>
+          </div>
+        </div>
+
+        <!-- Budget row group -->
+        <div class="budget-rows">
+          <!-- Row 1: Budget -->
+          <div class="budget-row">
+            <span class="budget-label">Budget</span>
+            <span class="budget-val-default">THB 5,000</span>
+          </div>
+
+          <!-- Row 2: Spent -->
+          <div class="budget-row">
+            <div class="budget-label">
+              <span>Spent</span>
+              <div class="spent-bar-container">
+                <div class="spent-bar-fill"></div>
+              </div>
+            </div>
+            <span class="budget-val-spent">THB 1,950</span>
+          </div>
+
+          <!-- Row 3: Remaining -->
+          <div class="budget-row">
+            <span class="budget-label">Remaining</span>
+            <span class="budget-val-remaining">THB 3,050</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- (4) Stat Tiles (3-across) -->
+      <section class="stat-row">
+        <!-- Tile 1: Saved places -->
+        <div class="stat-tile">
+          <span class="stat-micro-label">Saved places</span>
+          <span class="stat-number">8</span>
+        </div>
+
+        <!-- Tile 2: Packing -->
+        <div class="stat-tile">
+          <span class="stat-micro-label">Packing</span>
+          <div>
+            <span class="stat-number">3/5</span>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tile 3: Activities -->
+        <div class="stat-tile">
+          <span class="stat-micro-label">Activities</span>
+          <span class="stat-number">6</span>
+        </div>
+      </section>
+
+      <!-- (5) Next Up Card -->
+      <section class="card">
+        <div class="card-header-simple">
+          <h2 class="card-title">Next up</h2>
+        </div>
+        <div>
+          <!-- Activity 1 -->
+          <div class="activity-row">
+            <div class="day-chip">D1</div>
+            <div class="activity-info">
+              <div class="activity-title">Wat Phra That Doi Suthep</div>
+              <div class="activity-meta">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>09:00 - Temple</span>
+              </div>
+            </div>
+            <div class="activity-estimate">THB 30</div>
+          </div>
+
+          <!-- Activity 2 -->
+          <div class="activity-row">
+            <div class="day-chip">D1</div>
+            <div class="activity-info">
+              <div class="activity-title">Khao Soi lunch in Nimman</div>
+              <div class="activity-meta">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>13:00 - Food</span>
+              </div>
+            </div>
+            <div class="activity-estimate">THB 120</div>
+          </div>
+
+          <!-- Activity 3 -->
+          <div class="activity-row">
+            <div class="day-chip">D2</div>
+            <div class="activity-info">
+              <div class="activity-title">Night bazaar walk</div>
+              <div class="activity-meta">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>19:30 - Market</span>
+              </div>
+            </div>
+            <div class="activity-estimate">THB 0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- (6) Weather Card -->
+      <section class="card weather-card">
+        <div class="weather-top">
+          <span class="weather-temp">31&deg;</span>
+          <span class="weather-desc">Partly cloudy</span>
+        </div>
+
+        <div class="forecast-strip">
+          <!-- Col 1 -->
+          <div class="forecast-col">
+            <span class="forecast-day">Wed 31&deg;</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B616E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+            </svg>
+          </div>
+
+          <!-- Col 2 -->
+          <div class="forecast-col">
+            <span class="forecast-day">Thu 30&deg;</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B616E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          </div>
+
+          <!-- Col 3 -->
+          <div class="forecast-col">
+            <span class="forecast-day">Fri 29&deg;</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B616E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          </div>
+
+          <!-- Col 4 -->
+          <div class="forecast-col">
+            <span class="forecast-day">Sat 28&deg;</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B616E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+              <path d="M11 20v2"></path>
+              <path d="M7 20v2"></path>
+              <path d="M15 20v2"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="weather-footer-meta">Open-Meteo &bull; updated 5 min ago</div>
+      </section>
+
+      <!-- (7) Disclaimer text -->
+      <div class="disclaimer-text">Sample data &mdash; not verified</div>
+    </main>
+
+    <!-- (8) Fixed Bottom Tab Bar -->
+    <nav class="bottom-tab-bar">
+      <!-- Tab 1: Home (active) -->
+      <a href="#home" class="tab-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span class="tab-label">Home</span>
+      </a>
+
+      <!-- Tab 2: Discover -->
+      <a href="#discover" class="tab-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+        <span class="tab-label">Discover</span>
+      </a>
+
+      <!-- Tab 3: Saved -->
+      <a href="#saved" class="tab-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+        </svg>
+        <span class="tab-label">Saved</span>
+      </a>
+
+      <!-- Tab 4: Trips -->
+      <a href="#trips" class="tab-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
+        </svg>
+        <span class="tab-label">Trips</span>
+      </a>
+
+      <!-- Tab 5: Account -->
+      <a href="#account" class="tab-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="tab-label">Account</span>
+      </a>
+    </nav>
+  </div>
+</body>
+</html>

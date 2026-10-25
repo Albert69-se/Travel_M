@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Travel M - Discover Places</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-container": "#dddfee",
+            "on-error-container": "#93000a",
+            "surface-container-highest": "#e2e2e8",
+            "tertiary": "#7e3000",
+            "surface-variant": "#e2e2e8",
+            "surface-bright": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "primary": "#3525cd",
+            "on-surface": "#1a1c20",
+            "error": "#ba1a1a",
+            "surface": "#f9f9ff",
+            "inverse-surface": "#2f3035",
+            "background": "#f9f9ff",
+            "on-tertiary-fixed-variant": "#7b2f00",
+            "on-secondary-fixed": "#181b26",
+            "outline": "#777587",
+            "on-surface-variant": "#464555",
+            "primary-fixed-dim": "#c3c0ff",
+            "on-primary-container": "#dad7ff",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#e0e2f0",
+            "surface-tint": "#4d44e3",
+            "tertiary-fixed-dim": "#ffb695",
+            "on-tertiary-fixed": "#351000",
+            "on-tertiary-container": "#ffd2be",
+            "primary-fixed": "#e2dfff",
+            "on-primary-fixed-variant": "#3323cc",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed": "#ffdbcc",
+            "surface-container": "#ededf3",
+            "on-primary": "#ffffff",
+            "surface-container-high": "#e8e8ed",
+            "primary-container": "#4f46e5",
+            "inverse-on-surface": "#f0f0f6",
+            "inverse-primary": "#c3c0ff",
+            "on-primary-fixed": "#0f0069",
+            "surface-container-low": "#f3f3f9",
+            "error-container": "#ffdad6",
+            "on-secondary-container": "#5f626f",
+            "surface-dim": "#d9d9df",
+            "tertiary-container": "#a44100",
+            "outline-variant": "#c7c4d8",
+            "secondary-fixed-dim": "#c3c6d4",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#434652",
+            "on-background": "#1a1c20",
+            "secondary": "#5b5e6a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "0.75rem",
+            "margin": "1.5rem",
+            "space-lg": "1rem",
+            "gutter-sm": "0.5rem",
+            "space-xl": "1.5rem",
+            "margin-mobile": "1rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter"],
+            "label-md": ["Inter"],
+            "title-md": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "code-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "body-sm": ["Inter"]
+          },
+          "fontSize": {
+            "body-lg": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+            "title-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "body-md": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "headline-sm": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "code-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      background-color: #F7F8FA;
+    }
+  </style>
+</head>
+<body class="h-full text-on-surface antialiased bg-[#F7F8FA] flex overflow-hidden">
+<!-- SIDEBAR (Fixed Left 228px from Shared Components JSON) -->
+<aside class="fixed top-0 left-0 h-screen w-[228px] shrink-0 border-r border-outline-variant bg-surface-container-lowest z-30 flex flex-col justify-between p-3">
+<!-- Top Block: Brand Header & Main Navs -->
+<div class="flex flex-col gap-4">
+<!-- App Brand Anchor -->
+<div class="px-2 pt-1 pb-1">
+<div class="text-headline-sm font-headline-sm text-on-surface tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]" data-icon="explore">explore</span>
+<span class="font-bold tracking-tight">Voyager</span>
+</div>
+<p class="text-label-sm font-label-sm text-secondary pl-7">Productivity Trip Planner</p>
+</div>
+<!-- Action Button -->
+<div class="px-1">
+<button class="w-full h-[34px] px-3 bg-primary-container hover:bg-[#4338CA] text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span>
+<span>+ New trip</span>
+</button>
+</div>
+<!-- Primary Navigation Cluster -->
+<nav class="flex flex-col gap-0.5">
+<!-- Home (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-body-md font-body-md">Home</span>
+</a>
+<!-- Discover (ACTIVE as determined by semantic match with 'Discover Places') -->
+<a class="relative flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container-low text-primary font-title-md before:content-[''] before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-1 before:bg-primary before:rounded-r" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="explore">explore</span>
+<span class="text-title-md font-title-md font-semibold">Discover</span>
+</a>
+<!-- Saved Places (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span class="text-body-md font-body-md">Saved Places</span>
+</a>
+<!-- My Trips (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="flight_takeoff">flight_takeoff</span>
+<span class="text-body-md font-body-md">My Trips</span>
+</a>
+<!-- Category Division Label -->
+<div class="px-3 pt-3 pb-1">
+<span class="text-label-sm font-label-sm uppercase text-outline tracking-wider font-semibold">TRIP</span>
+</div>
+<!-- Itinerary (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="text-body-md font-body-md">Itinerary</span>
+</a>
+<!-- Packing (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-body-md font-body-md">Packing</span>
+</a>
+<!-- Expenses (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-body-md font-body-md">Expenses</span>
+</a>
+<!-- Weather (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="wb_sunny">wb_sunny</span>
+<span class="text-body-md font-body-md">Weather</span>
+</a>
+</nav>
+</div>
+<!-- Bottom: User Profile Section & Footer Nav -->
+<div class="flex flex-col gap-2 pt-2 border-t border-[#E8E9ED]">
+<div class="flex items-center justify-between px-2 py-1.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-title-md text-[11px] font-semibold shrink-0">
+            AL
+          </div>
+<div class="flex flex-col min-w-0">
+<span class="text-title-md font-title-md truncate text-on-surface text-[12px] leading-tight">Alex Morgan</span>
+<span class="text-label-sm font-label-sm text-secondary truncate text-[10px]">Demo account</span>
+</div>
+</div>
+<div class="flex items-center text-secondary">
+<button class="p-1 hover:text-on-surface hover:bg-surface-container-highest rounded transition-colors" title="Settings">
+<span class="material-symbols-outlined text-[16px]" data-icon="settings">settings</span>
+</button>
+<button class="p-1 hover:text-on-surface hover:bg-surface-container-highest rounded transition-colors" title="Log Out">
+<span class="material-symbols-outlined text-[16px]" data-icon="logout">logout</span>
+</button>
+</div>
+</div>
+<div class="flex justify-between items-center px-2">
+<span class="text-[10px] text-outline font-code-sm">v1.4.2</span>
+<span class="text-[10px] text-outline font-label-sm">Travel M</span>
+</div>
+</div>
+</aside>
+<!-- MAIN VIEWPORT CONTAINER (Offset 228px for sidebar) -->
+<main class="ml-[228px] flex-1 h-screen overflow-y-auto">
+<div class="max-w-[1280px] mx-auto p-6 md:p-8 flex flex-col gap-5">
+<!-- Top Bar: Header & Actions -->
+<header class="flex items-center justify-between">
+<div class="flex flex-col">
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight font-bold">Discover places</h1>
+<p class="text-body-sm font-body-sm text-[#64748B]">8 places · sample records, not verified</p>
+</div>
+<div class="flex items-center gap-3">
+<!-- Segmented View Toggle (List vs Map) -->
+<div class="inline-flex p-0.5 bg-[#FFFFFF] border border-[#E8E9ED] rounded-lg shadow-sm">
+<button class="h-[30px] px-3 rounded-md bg-surface-container-low text-primary font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="format_list_bulleted">format_list_bulleted</span>
+<span>List</span>
+</button>
+<button class="h-[30px] px-3 rounded-md text-secondary hover:text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="map">map</span>
+<span>Map</span>
+</button>
+</div>
+<!-- Secondary Indigo Outlined Button -->
+<button class="h-[34px] px-3.5 bg-[#FFFFFF] border border-primary-container text-primary-container hover:bg-[#EEF0FF] rounded-lg font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="bookmark_add">bookmark_add</span>
+<span>+ Save to trip</span>
+</button>
+</div>
+</header>
+<!-- Search & Filter Controls -->
+<section class="flex items-center gap-3">
+<!-- Search Input with Leading Icon -->
+<div class="relative flex-1">
+<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#9AA0AC]">
+<span class="material-symbols-outlined text-[18px]" data-icon="search">search</span>
+</span>
+<input class="w-full h-[40px] pl-10 pr-4 bg-[#FFFFFF] border border-[#E8E9ED] rounded-lg text-body-md font-body-md text-on-surface placeholder-[#9AA0AC] focus:border-primary-container focus:ring-2 focus:ring-[#EEF0FF] focus:outline-none transition-all shadow-sm" placeholder="Search places, cities or categories" type="text"/>
+</div>
+<!-- Filter Trigger -->
+<button class="h-[40px] px-3.5 bg-[#FFFFFF] border border-[#E8E9ED] hover:bg-[#F7F8FA] text-on-surface rounded-lg font-label-md text-label-md font-medium flex items-center gap-2 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-[#5B616E]" data-icon="tune">tune</span>
+<span>Filters</span>
+</button>
+</section>
+<!-- Category Filter Chips Row -->
+<section class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+<!-- All (Selected) -->
+<button class="h-[26px] px-3.5 bg-primary-container text-on-primary rounded-full text-label-sm font-label-sm font-medium flex items-center justify-center shrink-0 shadow-xs">
+          All
+        </button>
+<!-- Category Chips (Outlined) -->
+<button class="h-[26px] px-3 bg-[#FFFFFF] border border-[#E8E9ED] hover:border-outline text-[#5B616E] hover:text-on-surface rounded-full text-label-sm font-label-sm font-medium flex items-center justify-center shrink-0 transition-colors shadow-xs">
+          Temples
+        </button>
+<button class="h-[26px] px-3 bg-[#FFFFFF] border border-[#E8E9ED] hover:border-outline text-[#5B616E] hover:text-on-surface rounded-full text-label-sm font-label-sm font-medium flex items-center justify-center shrink-0 transition-colors shadow-xs">
+          Nature
+        </button>
+<button class="h-[26px] px-3 bg-[#FFFFFF] border border-[#E8E9ED] hover:border-outline text-[#5B616E] hover:text-on-surface rounded-full text-label-sm font-label-sm font-medium flex items-center justify-center shrink-0 transition-colors shadow-xs">
+          Food
+        </button>
+<button class="h-[26px] px-3 bg-[#FFFFFF] border border-[#E8E9ED] hover:border-outline text-[#5B616E] hover:text-on-surface rounded-full text-label-sm font-label-sm font-medium flex items-center justify-center shrink-0 transition-colors shadow-xs">
+          Markets
+        </button>
+<button class="h-[26px] px-3 bg-[#FFFFFF] border border-[#E8E9ED] hover:border-outline text-[#5B616E] hover:text-on-surface rounded-full text-label-sm font-label-sm font-medium flex items-center justify-center shrink-0 transition-colors shadow-xs">
+          Museums
+        </button>
+<button class="h-[26px] px-3 bg-[#FFFFFF] border border-[#E8E9ED] hover:border-outline text-[#5B616E] hover:text-on-surface rounded-full text-label-sm font-label-sm font-medium flex items-center justify-center shrink-0 transition-colors shadow-xs">
+          Viewpoints
+        </button>
+</section>
+<!-- Two-Column Workspace (55% / 45% split, 620px fixed height) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-4 h-[620px]">
+<!-- LEFT COLUMN: Places List (55% -> 7 cols of 12) -->
+<div class="lg:col-span-7 bg-[#FFFFFF] border border-[#E8E9ED] rounded-xl overflow-hidden flex flex-col h-full shadow-[0_1px_2px_rgba(15,17,21,0.04)]">
+<!-- Scrollable List of 5 Rows -->
+<div class="flex-1 overflow-y-auto divide-y divide-[#E8E9ED]">
+<!-- Row 1: Wat Phra That Doi Suthep (Saved) -->
+<article class="p-3.5 flex items-center justify-between gap-3.5 hover:bg-[#F9FAFB] transition-colors cursor-pointer group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-16 h-16 rounded-lg object-cover shrink-0 border border-[#E8E9ED]" data-alt="Golden Buddhist stupa chedi of Wat Phra That Doi Suthep gleaming in morning sunlight on mountain summit in Chiang Mai Thailand. Architectural detail in clean high contrast lighting with subtle mist and blue skies in minimal travel photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9avUGw4LK3ZTpLWtnPAiC4zqSq3aNsQDW8LAzX2SzpTRDYlLBtfvMfMZsMwXqWcZKOOqZJ0TE_L5qFyY8DmnHfzZ_rg8EZoqqimMpQalACQNpjx6UpkZ7T2fv19FSuQTu1iX4ew-30FhHSrrnZM-KyGvd9WNGsorO0hreQ6go-Z2GQbB7SCviaOlGbzr5aaygYJIY40_3H23byzN1BTiTAMIYLTv7TDjFc-ZapHV7yrLzvZlAwFARMCeYOCmSujFou2l7dSpIb2HJ"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="text-headline-sm font-headline-sm text-on-surface truncate group-hover:text-primary transition-colors">Wat Phra That Doi Suthep</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#EEF0FF] text-[#4F46E5] shrink-0 font-medium">Temples</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary truncate">Sacred mountaintop temple overlooking Chiang Mai valley</p>
+<div class="flex items-center gap-3 mt-1 text-[11px] text-[#9AA0AC]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]" data-icon="star">star</span> 4.8 (2.4k)</span>
+<span>·</span>
+<span>15 km west</span>
+</div>
+</div>
+</div>
+<button class="p-2 text-primary hover:bg-[#EEF0FF] rounded-lg transition-colors shrink-0" title="Saved">
+<span class="material-symbols-outlined text-[20px]" data-icon="bookmark" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</article>
+<!-- Row 2: Wat Phra Singh (Unsaved) -->
+<article class="p-3.5 flex items-center justify-between gap-3.5 hover:bg-[#F9FAFB] transition-colors cursor-pointer group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-16 h-16 rounded-lg object-cover shrink-0 border border-[#E8E9ED]" data-alt="Traditional Lanna wood and gold architecture of Wat Phra Singh assembly hall in Chiang Mai old city. Symmetrical exterior facade bathed in crisp daylight, elegant minimalist perspective with sharp clean lines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv0FCr5XyxC6IJ_OOVet3JjagAui0D2krWmR3kYzgMrHrkNIbZ7k-YHwCE0EHUxw4nJaTK07-8g8qaxWq0FaStksrGOjfxJUnl3ZX4i-wFanq8SJbIzjxXI4h2hGfEuIWHO1BQB9iAxnsF5mSsXiYSgLAo19wvB4-Qs7gbIXjEsaQtywwNVjvfKMYqXHE2uzwlL-bQOAF6ei4duXs5_5xtMiBNM7cniLXonCg4rjfDPQx6Jfldb1zUF2swiTMMe8v9FGlq-8vyTOrE"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="text-headline-sm font-headline-sm text-on-surface truncate group-hover:text-primary transition-colors">Wat Phra Singh</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#EEF0FF] text-[#4F46E5] shrink-0 font-medium">Temples</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary truncate">14th-century temple housing the revered Phra Buddha Sihing</p>
+<div class="flex items-center gap-3 mt-1 text-[11px] text-[#9AA0AC]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]" data-icon="star">star</span> 4.7 (1.8k)</span>
+<span>·</span>
+<span>Old City center</span>
+</div>
+</div>
+</div>
+<button class="p-2 text-[#94A3B8] hover:text-primary hover:bg-[#F1F3F9] rounded-lg transition-colors shrink-0" title="Save place">
+<span class="material-symbols-outlined text-[20px]" data-icon="bookmark">bookmark</span>
+</button>
+</article>
+<!-- Row 3: Doi Inthanon National Park (Saved) -->
+<article class="p-3.5 flex items-center justify-between gap-3.5 hover:bg-[#F9FAFB] transition-colors cursor-pointer group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-16 h-16 rounded-lg object-cover shrink-0 border border-[#E8E9ED]" data-alt="Twin royal chedis pagodas surrounded by manicured alpine gardens and cloud forest mist at Doi Inthanon mountain summit. Crisp scenic viewpoint under radiant daytime sky, subdued natural greens and slate tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLENE0lRzJRTWW7wdqTZYSPpNiWhhTnsczEJnq89C4MJB8uILceEU9mV4AWau4QmQhQQAnEQ7NOBzktxK8GPjaGAnmxtgEI4YJ8hvwNfXzgCA4qBZrXWROWzsX02rnhLoIh_XsDqmEXMaBUXC9G3_GGNrQVeTZPz3IM8e-5mYu6Ql7NeRnl3nF6pPqY_PvaTqvRv3dTYl5pXYmh_1a9G9Q0OqyEtgwyHvT7vFQhHnMgom6bcuFRMfAtibdVHv5HCsAJjjU0R0AqPtz"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="text-headline-sm font-headline-sm text-on-surface truncate group-hover:text-primary transition-colors">Doi Inthanon National Park</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#EEF0FF] text-[#4F46E5] shrink-0 font-medium">Nature</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary truncate">Highest peak in Thailand with cloud forests, twin royal pagodas and trails</p>
+<div class="flex items-center gap-3 mt-1 text-[11px] text-[#9AA0AC]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]" data-icon="star">star</span> 4.9 (3.1k)</span>
+<span>·</span>
+<span>85 km southwest</span>
+</div>
+</div>
+</div>
+<button class="p-2 text-primary hover:bg-[#EEF0FF] rounded-lg transition-colors shrink-0" title="Saved">
+<span class="material-symbols-outlined text-[20px]" data-icon="bookmark" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</article>
+<!-- Row 4: Sunday Walking Street Market (Saved) -->
+<article class="p-3.5 flex items-center justify-between gap-3.5 hover:bg-[#F9FAFB] transition-colors cursor-pointer group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-16 h-16 rounded-lg object-cover shrink-0 border border-[#E8E9ED]" data-alt="Pedestrian street market at dusk on Ratchadamnoen road Chiang Mai lined with warm paper lanterns, craft stalls and artisanal street food vendors in neat photographic layout with crisp ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHU8RNPP0SwB6SyCwGyOgKfzpEQ4o-ckX1M10rIZ8QP0l0vbxCkVt68U4Oqe9thHMMJ-IJmicmQJBrZE9HyjmazqevIrm40enFHSjZgYux45dr4yl0zZgqqtMvLWLtKw0jVlfkHqcHh2HWDksDZpmpWNbzPiChRsUND9CD6OFNz-lEwOPdeGg-zrtv_IE6agtiaRv7W-bRobaaUk3V5X32Uw7QxT2EMBhNwRwLdNMmmv9d128QuOkXPMsCMfjbnbhjzVnqfZr8_og8"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="text-headline-sm font-headline-sm text-on-surface truncate group-hover:text-primary transition-colors">Sunday Walking Street Market</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#EEF0FF] text-[#4F46E5] shrink-0 font-medium">Markets</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary truncate">Vibrant night market with local street food, crafts and live music</p>
+<div class="flex items-center gap-3 mt-1 text-[11px] text-[#9AA0AC]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]" data-icon="star">star</span> 4.8 (4.2k)</span>
+<span>·</span>
+<span>Tha Phae Gate</span>
+</div>
+</div>
+</div>
+<button class="p-2 text-primary hover:bg-[#EEF0FF] rounded-lg transition-colors shrink-0" title="Saved">
+<span class="material-symbols-outlined text-[20px]" data-icon="bookmark" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</article>
+<!-- Row 5: Huay Tueng Thao Lake (Unsaved) -->
+<article class="p-3.5 flex items-center justify-between gap-3.5 hover:bg-[#F9FAFB] transition-colors cursor-pointer group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-16 h-16 rounded-lg object-cover shrink-0 border border-[#E8E9ED]" data-alt="Calm reflective reservoir lake Huay Tueng Thao with traditional thatched bamboo pavilions floating near the grassy shore backed by Doi Suthep mountain ridge under clear sunny skies in Chiang Mai." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7FN8RGUoGyedqpmtjl-vLPfSlpURF6OsuLOWKDaeW1XOiVrGdfVWZ4OGUHc3IqBZONGhUcCK_PE8Omw8rwvGpqiED9TrHp0G2uw6zW28Fn359OSQQWxNWinjrvv_5dvIBtmvC9birDUKeJAw-9dRV4Pp03jub3eczm3js3c7jM5vNSfsSeS1P4UGPds7bj5IgGz5Mvostgbty-eSbq7OGHE7XymHsSVnI8bD_ldapUb3E6vW4SEg-R8C7sgI9ehoip_uvzE0ImaGd"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="text-headline-sm font-headline-sm text-on-surface truncate group-hover:text-primary transition-colors">Huay Tueng Thao Lake</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#EEF0FF] text-[#4F46E5] shrink-0 font-medium">Nature</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary truncate">Tranquil reservoir with waterfront bamboo huts and mountain backdrop</p>
+<div class="flex items-center gap-3 mt-1 text-[11px] text-[#9AA0AC]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]" data-icon="star">star</span> 4.5 (980)</span>
+<span>·</span>
+<span>12 km north</span>
+</div>
+</div>
+</div>
+<button class="p-2 text-[#94A3B8] hover:text-primary hover:bg-[#F1F3F9] rounded-lg transition-colors shrink-0" title="Save place">
+<span class="material-symbols-outlined text-[20px]" data-icon="bookmark">bookmark</span>
+</button>
+</article>
+</div>
+<!-- List Card Footer -->
+<footer class="h-10 px-4 border-t border-[#E8E9ED] bg-[#FFFFFF] flex items-center justify-center shrink-0">
+<span class="text-body-sm font-body-sm text-outline">Showing 5 of 8 results</span>
+</footer>
+</div>
+<!-- RIGHT COLUMN: Map Panel (45% -> 5 cols of 12) -->
+<div class="lg:col-span-5 rounded-xl border border-[#E8E9ED] bg-[#F2EFE9] relative overflow-hidden shadow-sm h-full flex flex-col" data-location="Chiang Mai, Thailand" style="">
+<!-- Detailed Precision SVG Map -->
+<svg class="w-full h-full object-cover select-none" fill="none" viewbox="0 0 540 620" xmlns="http://www.w3.org/2000/svg">
+<!-- Background Terrain Base -->
+<rect fill="#F2EFE9" height="620" width="540"></rect>
+<!-- Mountain Terrain & Forest Reserves (Soft Pale Greens) -->
+<!-- Doi Suthep - Pui National Park Area (West) -->
+<path d="M-20 40 Q80 20 130 90 T170 230 T130 380 T70 480 T-20 540 Z" fill="#E2EEDD" opacity="0.9"></path>
+<path d="M-30 80 Q50 60 90 140 T120 260 T80 390 T-30 460 Z" fill="#D9EBD3" opacity="0.95"></path>
+<!-- Huay Tueng Thao Reserve Area (North West) -->
+<path d="M60 -20 Q140 10 170 60 T140 130 T60 90 Z" fill="#D9EBD3"></path>
+<!-- Northern Green Area -->
+<path d="M260 -10 Q320 30 400 15 T480 -20 Z" fill="#E5EFE2"></path>
+<!-- Southern Mountain Hint (Doi Inthanon vector zone) -->
+<path d="M-10 490 Q70 460 110 520 T80 640 T-20 640 Z" fill="#D9EBD3"></path>
+<!-- Minor Water Reservoirs -->
+<!-- Huay Tueng Thao Reservoir Shape -->
+<path d="M125 75 C132 70 148 72 152 82 C154 92 142 102 133 99 C126 96 122 84 125 75 Z" fill="#CCE3F5"></path>
+<!-- River Mae Ping (Winding Clean Blue Ribbon) -->
+<path d="M375 -20 C365 40 370 100 355 160 C340 220 350 290 335 360 C320 430 330 500 315 570 C310 595 305 620 300 640" stroke="#CCE3F5" stroke-linecap="round" stroke-width="14"></path>
+<path d="M375 -20 C365 40 370 100 355 160 C340 220 350 290 335 360 C320 430 330 500 315 570 C310 595 305 620 300 640" stroke="#B9DCFA" stroke-linecap="round" stroke-width="8"></path>
+<!-- Secondary Canal / Klong Mae Kha -->
+<path d="M295 180 C290 220 285 280 292 340 C298 390 285 450 280 500" stroke="#CCE3F5" stroke-dasharray="2 1" stroke-width="3"></path>
+<!-- Primary Highway / Superhighway Network (White with Hairline Gray Borders) -->
+<!-- Route 11 Superhighway (Loop East) -->
+<path d="M180 15 C260 40 380 90 410 170 C440 250 430 360 405 450 C380 540 320 610 270 640" stroke="#E5E2DA" stroke-width="6"></path>
+<path d="M180 15 C260 40 380 90 410 170 C440 250 430 360 405 450 C380 540 320 610 270 640" stroke="#FFFFFF" stroke-width="4"></path>
+<!-- Canal Road (Chonprathan Road - West Spine) -->
+<path d="M150 -10 L155 180 L160 380 L145 630" stroke="#E5E2DA" stroke-width="5"></path>
+<path d="M150 -10 L155 180 L160 380 L145 630" stroke="#FFFFFF" stroke-width="3"></path>
+<!-- Route 1004 (Huay Kaew Rd up to Doi Suthep) -->
+<path d="M250 240 L195 230 L155 220 L105 190 L60 170" stroke="#E5E2DA" stroke-width="4.5"></path>
+<path d="M250 240 L195 230 L155 220 L105 190 L60 170" stroke="#FFFFFF" stroke-width="2.5"></path>
+<!-- Historic Chiang Mai Old City Moat (Perfect Square) -->
+<rect fill="#F8F7F3" height="70" rx="3" stroke="#CCE3F5" stroke-width="5" width="70" x="235" y="245"></rect>
+<rect fill="none" height="70" rx="3" stroke="#E5E2DA" stroke-width="1" width="70" x="235" y="245"></rect>
+<!-- Old City Internal Streets (Ratchadamnoen East-West & Phra Pok Klao North-South) -->
+<line stroke="#FFFFFF" stroke-width="2.5" x1="235" x2="305" y1="280" y2="280"></line>
+<line stroke="#FFFFFF" stroke-width="2.5" x1="270" x2="270" y1="245" y2="315"></line>
+<!-- Secondary Urban Arteries (Nimman, Chang Khlan, Charoen Prathet) -->
+<line stroke="#FFFFFF" stroke-width="2" x1="160" x2="235" y1="230" y2="255"></line>
+<line stroke="#FFFFFF" stroke-width="3" x1="305" x2="360" y1="280" y2="280"></line> <!-- Tha Phae Road to River -->
+<line stroke="#FFFFFF" stroke-width="2" x1="360" x2="430" y1="280" y2="295"></line> <!-- Charoen Mueang Road -->
+<line stroke="#FFFFFF" stroke-width="2" x1="235" x2="160" y1="315" y2="390"></line>
+<line stroke="#FFFFFF" stroke-width="2" x1="305" x2="345" y1="315" y2="380"></line>
+<line stroke="#FFFFFF" stroke-width="2" x1="305" x2="360" y1="245" y2="200"></line>
+<!-- Chiang Mai Airport Runway (Southwest of Old City) -->
+<g transform="translate(190, 345) rotate(-28)">
+<rect fill="#E4E3DD" height="12" rx="2" stroke="#D1CEC5" stroke-width="1" width="85" x="0" y="0"></rect>
+<line stroke="#FFFFFF" stroke-dasharray="4 3" stroke-width="1.5" x1="5" x2="80" y1="6" y2="6"></line>
+</g>
+<!-- District / Location Text Labels -->
+<text fill="#888B94" font-family="Inter" font-size="9" font-weight="600" letter-spacing="0.08em" text-anchor="middle" x="270" y="295">OLD CITY</text>
+<text fill="#9AA0AC" font-family="Inter" font-size="8" font-weight="500" x="185" y="215">Nimman</text>
+<text fill="#9AA0AC" font-family="Inter" font-size="8" font-weight="500" x="350" y="325">Mae Ping</text>
+<text fill="#758B6E" font-family="Inter" font-size="9" font-weight="600" x="40" y="140">Doi Suthep Range</text>
+<!-- MAP PIN MARKERS -->
+<!-- Marker 1: Wat Phra Singh (Old City Center) -->
+<g class="cursor-pointer" transform="translate(255, 275)">
+<circle cx="0" cy="0" fill="#4F46E5" fill-opacity="0.15" r="10"></circle>
+<circle cx="0" cy="0" fill="#4F46E5" r="5"></circle>
+<circle cx="0" cy="0" fill="#FFFFFF" r="2"></circle>
+</g>
+<!-- Marker 2: Sunday Walking Street / Tha Phae Gate -->
+<g class="cursor-pointer" transform="translate(305, 280)">
+<circle cx="0" cy="0" fill="#4F46E5" r="5"></circle>
+<circle cx="0" cy="0" fill="#FFFFFF" r="2"></circle>
+</g>
+<!-- Marker 3: Nimman Art & Food Hub -->
+<g class="cursor-pointer" transform="translate(190, 230)">
+<circle cx="0" cy="0" fill="#4F46E5" r="4.5"></circle>
+<circle cx="0" cy="0" fill="#FFFFFF" r="1.5"></circle>
+</g>
+<!-- Marker 4: Huay Tueng Thao Lake -->
+<g class="cursor-pointer" transform="translate(140, 88)">
+<circle cx="0" cy="0" fill="#4F46E5" r="5"></circle>
+<circle cx="0" cy="0" fill="#FFFFFF" r="2"></circle>
+</g>
+<!-- Marker 5: Doi Inthanon National Park (Southwest) -->
+<g class="cursor-pointer" transform="translate(50, 540)">
+<circle cx="0" cy="0" fill="#4F46E5" r="5.5"></circle>
+<circle cx="0" cy="0" fill="#FFFFFF" r="2"></circle>
+</g>
+<!-- Marker 6: Wat Phra That Doi Suthep (ACTIVE PIN with Highlight Pulse) -->
+<g class="cursor-pointer" transform="translate(70, 172)">
+<circle cx="0" cy="0" fill="#4F46E5" fill-opacity="0.2" r="14"></circle>
+<circle cx="0" cy="0" fill="#4F46E5" r="7"></circle>
+<circle cx="0" cy="0" fill="#FFFFFF" r="2.5"></circle>
+<!-- Pin Pointer Tail -->
+<path d="M-4 2 L0 9 L4 2 Z" fill="#4F46E5"></path>
+</g>
+</svg>
+<!-- ACTIVE POPUP TOOLTIP (Anchored to Doi Suthep Pin at left: 70px, top: 172px) -->
+<div class="absolute top-[82px] left-[78px] w-56 bg-[#FFFFFF] border border-[#E2E8F0] rounded-lg p-3 shadow-[0_4px_12px_rgba(15,17,21,0.08)] z-10">
+<div class="flex items-start justify-between gap-1.5 mb-1">
+<h3 class="text-title-md font-title-md font-bold text-on-surface leading-tight">Wat Phra That Doi Suthep</h3>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#EEF0FF] text-[#4F46E5] shrink-0">Temples</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary text-[11px] mb-2 leading-tight">15 km west · Mountain peak</p>
+<div class="flex items-center justify-between pt-1 border-t border-[#F1F3F9]">
+<span class="text-[11px] font-medium text-emerald-600 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Open daily
+              </span>
+<a class="text-[12px] font-semibold text-[#4F46E5] hover:underline flex items-center gap-0.5" href="#">
+                Open details →
+              </a>
+</div>
+</div>
+<!-- Map Controls (Top Right: Zoom + / -) -->
+<div class="absolute top-3.5 right-3.5 flex flex-col bg-[#FFFFFF] border border-[#E8E9ED] rounded-md shadow-sm overflow-hidden z-10">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface hover:bg-[#F7F8FA] border-b border-[#E8E9ED] transition-colors" title="Zoom in">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface hover:bg-[#F7F8FA] transition-colors" title="Zoom out">
+<span class="material-symbols-outlined text-[18px]" data-icon="remove">remove</span>
+</button>
+</div>
+<!-- Bottom-Left Attribution Badge -->
+<div class="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-[#FFFFFF]/90 backdrop-blur-none border border-[#E8E9ED] rounded text-[10px] text-[#777587] shadow-xs z-10 font-label-sm">
+            © OpenStreetMap contributors
+          </div>
+</div>
+</section>
+<!-- Footnote Below Workspace -->
+<footer class="pt-1 pb-4">
+<p class="text-[11px] font-label-sm text-[#777587]">
+          Map tiles come from the OpenStreetMap Foundation's public tile servers — intended for light use, not production traffic.
+        </p>
+</footer>
+</div>
+</main>
+</body></html>

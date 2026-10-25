@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Travel M">
+  <rect width="64" height="64" rx="15" fill="#147D70"/>
+  <path d="M32 8C19.5 8 10 17.5 10 30c0 15.5 22 29 22 29s22-13.5 22-29C54 17.5 44.5 8 32 8Z" fill="#FFFFFF"/>
+  <circle cx="32" cy="30" r="12" fill="#147D70"/>
+  <path d="m32 19 5.5 17-5.5-4-5.5 4L32 19Z" fill="#FFFFFF"/>
+</svg>

@@ -1,0 +1,205 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Travel M design system — tokens
+   Generated from the Stitch design system "Travel M"
+   (project 14201776433585101988, asset 99888471b4ff4ab4b9190b071556c735).
+   Compact, utility-first: hairline segmentation, micro-elevation, one accent.
+   --------------------------------------------------------------------------- */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Surfaces */
+  --color-canvas: #f6f7f3;
+  --color-surface: #ffffff;
+  --color-sunken: #eef2ed;
+  --color-line: #e3e8e1;
+  --color-line-strong: #cbd5cb;
+
+  /* Text */
+  --color-ink: #18332e;
+  --color-ink-secondary: #5d706a;
+  --color-ink-tertiary: #6b7c75;
+
+  /* Accent */
+  --color-accent: #147d70;
+  --color-accent-hover: #0e665b;
+  --color-accent-active: #0a5149;
+  --color-tint: #e6f3ed;
+
+  /* Semantic */
+  --color-success: #16a34a;
+  --color-success-bg: #dcfce7;
+  --color-warning: #d97706;
+  --color-warning-bg: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+
+  /* Type scale — display is capped at 24px to preserve spatial utility */
+  --text-micro: 11px;
+  --text-micro--line-height: 14px;
+  --text-micro--letter-spacing: 0.06em;
+  --text-label: 12px;
+  --text-label--line-height: 16px;
+  --text-body: 14px;
+  --text-body--line-height: 21px;
+  --text-base: 14px;
+  --text-base--line-height: 20px;
+  --text-card-title: 15px;
+  --text-card-title--line-height: 20px;
+  --text-card-title--letter-spacing: -0.01em;
+  --text-section: 18px;
+  --text-section--line-height: 24px;
+  --text-section--letter-spacing: -0.015em;
+  --text-title: 32px;
+  --text-title--line-height: 40px;
+  --text-title--letter-spacing: -0.02em;
+  --text-metric: 22px;
+  --text-metric--line-height: 28px;
+  --text-metric--letter-spacing: -0.02em;
+
+  /* Geometry */
+  --radius-card: 18px;
+  --radius-control: 8px;
+  --radius-chip: 9999px;
+
+  /* Elevation — micro-elevation only, never expressive shadows */
+  --shadow-card: 0 1px 2px 0 rgba(15, 17, 21, 0.04);
+  --shadow-popover: 0 4px 12px 0 rgba(15, 17, 21, 0.08);
+  --shadow-modal: 0 8px 24px -4px rgba(15, 17, 21, 0.12);
+}
+
+/* Component anatomy that Tailwind utilities cannot express compactly. */
+@layer components {
+  .tm-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Money and counts line up in columns. */
+  .tm-numeric {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tm-focus:focus-visible {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px var(--color-tint);
+  }
+
+  .tm-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 18px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Weight 700 and above is prohibited by the design system. */
+  strong,
+  b {
+    font-weight: 600;
+  }
+
+  ::placeholder {
+    color: var(--color-ink-tertiary);
+  }
+
+  /* Leaflet's chrome is squared off; match the design system instead. */
+  .leaflet-container {
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    background: var(--color-sunken);
+  }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .leaflet-popup-content {
+    margin: 10px 12px;
+    font-size: var(--text-label);
+    line-height: 16px;
+  }
+}
+
+/* Prototype refresh: a calm, spacious travel workspace. */
+.tm-eyebrow { color: var(--color-accent); font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 10px; }
+.tm-shell-rail { padding-top: 28px; }
+.tm-shell-rail nav a { height: 44px; }
+.tm-shell-top { height: 68px; border-bottom: 1px solid var(--color-line); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: var(--color-surface); color: var(--color-ink-secondary); font-size: 12px; }
+.tm-shell-top span:first-child { color: var(--color-ink); font-weight: 600; }
+.tm-hero { display: grid; grid-template-columns: 1.2fr 1fr; min-height: 340px; background: #e6eee6; border: 1px solid #dce5da; border-radius: 24px; overflow: hidden; }
+.tm-hero-copy { padding: 42px; position: relative; z-index: 1; }
+.tm-hero h1 { font-size: clamp(32px, 3.5vw, 49px); line-height: 1.1; letter-spacing: -.045em; font-weight: 600; max-width: 470px; }
+.tm-hero-copy > p:not(.tm-eyebrow) { max-width: 360px; color: #4f6c60; line-height: 1.7; margin-top: 18px; }
+.tm-hero-art { width: 100%; height: 100%; min-height: 300px; }
+.tm-home-section { display: flex; justify-content: space-between; align-items: end; margin-top: 18px; margin-bottom: 16px; gap: 12px; }
+.tm-home-section h2 { font-size: 22px; font-weight: 600; letter-spacing: -.025em; }
+.tm-feature-card { padding: 20px; display: flex; flex-direction: column; gap: 16px; transition: transform .2s, border-color .2s; }
+.tm-feature-card:hover { transform: translateY(-3px); border-color: var(--color-accent); }
+.tm-feature-card h3 { font-weight: 600; font-size: 16px; }
+.tm-feature-number { color: var(--color-accent); font-size: 11px; letter-spacing: .12em; }
+.tm-demo-banner { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 28px; align-items: center; }
+.tm-discover-workspace { display: grid; gap: 20px; margin-top: 22px; grid-template-columns: minmax(0, 1fr); }
+.tm-place-row { padding: 18px 16px; gap: 14px; min-height: 118px; align-items: center; transition: background .15s; }
+.tm-place-row.is-selected { background: var(--color-tint); box-shadow: inset 3px 0 var(--color-accent); }
+.tm-show-map { display: inline-flex; align-items: center; gap: 5px; color: var(--color-accent); font-size: 12px; margin-top: 8px; min-height: 28px; cursor: pointer; border-radius: 4px; }
+.tm-results-scroll { max-height: 600px; }
+.tm-map-panel { border: 1px solid var(--color-line); border-radius: 18px; background: white; overflow: hidden; isolation: isolate; }
+.tm-map-heading { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--color-line); gap: 8px; }
+.tm-map-heading > span { display: flex; gap: 8px; align-items: center; font-weight: 600; }
+.tm-map-reset { display: inline-flex; align-items: center; gap: 6px; padding: 7px 9px; border: 1px solid var(--color-line); border-radius: 8px; cursor: pointer; font-size: 12px; }
+.tm-map-reset:hover { background: var(--color-tint); }
+.tm-map-caption { display: flex; align-items: center; gap: 8px; padding: 12px 14px; font-size: 11px; line-height: 16px; color: var(--color-ink-secondary); }
+.tm-map-dot { height: 6px; width: 6px; background: var(--color-accent); border-radius: 50%; flex-shrink: 0; }
+.tm-map-message { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; background: var(--color-sunken); padding: 32px; text-align: center; }
+.tm-cluster { display: flex !important; justify-content: center; align-items: center; width: 42px; height: 42px; border: 3px solid white; border-radius: 50%; background: #147d70; color: white; box-shadow: 0 2px 8px #18332e40; font: 600 14px/1 system-ui; cursor: pointer; }
+.tm-cluster:hover { background: #0a5149; }
+.tm-place-pin { width: 22px; height: 22px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #147d70; border: 3px solid white; box-shadow: 0 2px 6px #18332e55; }
+.map-popup { padding: 4px; min-width: 160px; max-width: 240px; color: #18332e; font-family: var(--font-sans); }
+.map-popup strong { font-size: 15px; line-height: 21px; }
+.map-popup p { margin: 7px 0; color: #5d706a; }
+.map-popup button { background: #147d70; color: white; border-radius: 7px; padding: 8px 12px; cursor: pointer; }
+button, a, input, select { touch-action: manipulation; }
+@media (min-width: 1024px) {
+  .tm-discover-workspace { grid-template-columns: minmax(350px, .85fr) minmax(0, 1.35fr); align-items: start; }
+  .tm-discover-map { position: sticky; top: 24px; }
+}
+@media (max-width: 767px) {
+  .tm-shell-top { display: none; }
+  .tm-hero { grid-template-columns: 1fr; }
+  .tm-hero-copy { padding: 28px; }
+  .tm-hero-art { height: 180px; min-height: 0; }
+  .tm-demo-banner { grid-template-columns: 1fr; gap: 18px; padding: 22px; }
+  .tm-map-caption { flex-wrap: wrap; }
+  .tm-results-scroll { max-height: none; }
+  .tm-place-row { padding: 16px 12px; gap: 10px; }
+  .tm-map-heading { padding: 10px 12px; }
+  .tm-home-section h2 { font-size: 20px; }
+  h1.text-title { font-size: 28px; line-height: 36px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+
+.tm-location-toolbar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--color-line); font-size: 11px; line-height: 16px; color: var(--color-ink-secondary); }
+.tm-locate-button { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; background: var(--color-tint); color: var(--color-accent); padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+.tm-locate-button:disabled { opacity: .6; cursor: wait; }
+.tm-location-pin { height: 18px; width: 18px; background: #2563eb; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 5px #2563eb25; }

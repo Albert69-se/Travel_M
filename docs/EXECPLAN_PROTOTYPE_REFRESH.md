@@ -23,8 +23,8 @@ No new production dependencies; preserve data schema and existing records. No se
 1. Audit source, auth, map behavior and existing hosting. [complete]
 2. Implement presentation and map lifecycle/interaction changes. [complete]
 3. Run logic, lint, build and browser tests; inspect desktop/mobile screenshots. [complete: 59 logic tests, build, lint, browser checks documented]
-4. Initialize Git safely, commit reviewed source, sync student repository. [in progress]
-5. Back up VPS release; deploy over Tailscale SSH; verify public routes and browser flows.
+4. Initialize Git safely, commit reviewed source, sync student repository. [complete: private Albert69-se/Travel_M_React, main]
+5. Back up VPS release; deploy over Tailscale SSH; verify public routes and browser flows. [complete: active service, matching build hash, 25/25 public HTTP checks, live UI verified]
 
 ## Risks and validation
 External Google/OSM/photo/weather availability remains outside the app; test map fallback deliberately. Google demo key remains evaluation-only. Local storage remains device-bound. GitHub auth may require user intervention. Keep a VPS rollback snapshot before replacement.

@@ -25,3 +25,11 @@ Browser-only accounts and records have no backend security or cross-device persi
 
 ## Publishing
 Target: private Albert69-se/Travel_M_React repository; legacy Travel_M remains untouched. Existing VPS app at /home/opc/apps/travel-m-react, reached through SSH alias edux-oracle-vps over Tailscale. Preserve a release snapshot before deployment and verify public routes and the deployed UI.
+
+## Release verification
+- Application commit: `38a31a7` on `main`, pushed to the private student repository https://github.com/Albert69-se/Travel_M_React.
+- Deployed successfully to https://travel-m.xcalibur.space through Tailscale SSH; `travel-m-react.service` active.
+- 25/25 public HTTP smoke checks pass, including deep links, JavaScript/CSS, favicon and cache headers. Live browser confirms refreshed Discover and Google Maps with the location permission control.
+- Local and VPS `dist/index.html` SHA-256 match: `3e451485a6be1e48f2eeb367f5f7d2e054b5e973aff1876d7ac4ddf2126ddf04`.
+- Rollback snapshot: `/home/opc/apps/travel-m-react/dist.rollback-20261025-210457`; matching server backup is alongside `server/static-server.js`.
+- Deploy retains previous hashed assets for already-open tabs and uses rsync delayed replacement. No environment files or credentials are tracked.

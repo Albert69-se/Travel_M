@@ -1,28 +1,49 @@
 import { useEffect, useRef, useState } from 'react';
 import { LocateFixed, MapPin, Navigation } from 'lucide-react';
-import { requestLocation } from '../../core/location.js';
-import { describeProvider, mountMap } from '../../core/map.js';
-import { googleMapsDemoEnabled, mountGoogleDemoMap } from '../lib/google-map.js';
+import { watchLocation } from '../../core/location.js';
+import { mountGoogleDemoMap } from '../lib/google-map.js';
 
 /** Owns exactly one map instance; late async providers cannot reuse a retired host. */
 export function MapPanel({ places, subject = 'place', onOpenPlace, selectedPlace, className = '', heightClass = 'h-[560px]' }) {
   const containerRef = useRef(null);
   const controller = useRef(null);
   const position = useRef(null);
-  const [locationState, setLocationState] = useState({ busy: false, message: '' });
-  const locationRequest = useRef(0);
-  useEffect(() => () => { locationRequest.current += 1; }, []);
+  const [locationState, setLocationState] = useState({ busy: false, active: false, message: '' });
+  const stopWatch = useRef(null);
+  const centerLocation = useRef(false);
+  useEffect(() => () => { stopWatch.current?.(); }, []);
+  const stopLocation = () => {
+    stopWatch.current?.();
+    stopWatch.current = null;
+    position.current = null;
+    centerLocation.current = false;
+    controller.current?.clearLocation?.();
+    setLocationState({ busy: false, active: false, message: 'Location stopped. Your position was not saved.' });
+  };
   const locate = () => {
-    const request = ++locationRequest.current;
-    setLocationState({ busy: true, message: 'Allow location access in your browser to see where you are.' });
-    requestLocation(navigator.geolocation, window.isSecureContext).then(point => {
-      if (request !== locationRequest.current) return;
+    if (position.current && locationState.active) {
+      centerLocation.current = true;
+      if (controller.current) {
+        controller.current.showLocation(position.current, true);
+        centerLocation.current = false;
+      }
+      return;
+    }
+    stopWatch.current?.();
+    centerLocation.current = true;
+    setLocationState({ busy: true, active: true, message: 'Allow location access in your browser to see where you are.' });
+    stopWatch.current = watchLocation(navigator.geolocation, window.isSecureContext, point => {
       position.current = point;
-      controller.current?.showLocation?.(point, true);
-      setLocationState({ busy: false, message: `Your location · accurate to about ${Math.round(point.accuracy)} m. Not saved.` });
-    }, error => {
-      if (request !== locationRequest.current) return;
-      setLocationState({ busy: false, message: error.message });
+      if (controller.current) {
+        controller.current.showLocation(point, centerLocation.current);
+        centerLocation.current = false;
+      }
+      setLocationState({ busy: false, active: true, message: `Live location · accurate to about ${Math.round(point.accuracy)} m. Not saved.` });
+    }, (error, recovering = false) => {
+      position.current = null;
+      centerLocation.current = recovering;
+      controller.current?.clearLocation?.();
+      setLocationState({ busy: false, active: recovering, message: recovering ? `${error.message} Waiting for a new fix.` : error.message });
     });
   };
   const callbacks = useRef({ onOpenPlace, selectedPlace });
@@ -44,33 +65,31 @@ export function MapPanel({ places, subject = 'place', onOpenPlace, selectedPlace
     host.className = 'h-full w-full';
     node.replaceChildren(host);
     let cancelled = false;
-    let fellBack = false;
+    let authFailed = false;
     let cleanup;
     const show = (result, provider) => {
       if (cancelled) { result.cleanup?.(); return; }
       controller.current = result.ok ? result : null;
       if (!result.ok) setMarkerInfo({count: 0, total: 0});
       cleanup = result.cleanup;
-      if (result.ok && position.current) result.showLocation?.(position.current, false);
+      const locating = centerLocation.current;
+      if (result.ok && position.current) {
+        result.showLocation?.(position.current, centerLocation.current || !callbacks.current.selectedPlace);
+        centerLocation.current = false;
+      }
       setState({ loading: false, reason: result.ok ? '' : result.reason, provider });
-      if (result.ok && callbacks.current.selectedPlace) result.focusPlace?.(callbacks.current.selectedPlace);
+      if (result.ok && !locating && callbacks.current.selectedPlace) result.focusPlace?.(callbacks.current.selectedPlace);
     };
     const onMarkerChange = info => { if (!cancelled) setMarkerInfo(info); };
-    const fallback = () => {
-      if (cancelled || fellBack) return;
-      fellBack = true;
+    const unavailable = () => {
+      if (cancelled) return;
+      authFailed = true;
       cleanup?.();
-      host.replaceChildren();
-      show(mountMap(host, places || [], { subject, context: subject, onMarkerChange }), describeProvider().provider);
+      show({ ok: false, reason: 'Google Maps is unavailable. Check your connection and Google API access, then reload.' }, 'Google Maps');
     };
-    if (googleMapsDemoEnabled()) {
-      window.addEventListener('travelm:google-auth-failure', fallback);
-      mountGoogleDemoMap(host, places || [], id => callbacks.current.onOpenPlace?.(id), onMarkerChange, () => cancelled || fellBack)
-        .then(result => {
-          if (cancelled || fellBack) { result.cleanup?.(); return; }
-          if (result.ok) show(result, 'Google Maps'); else fallback();
-        }).catch(fallback);
-    } else fallback();
+    window.addEventListener('travelm:google-auth-failure', unavailable);
+    mountGoogleDemoMap(host, places || [], id => callbacks.current.onOpenPlace?.(id), onMarkerChange, () => cancelled || authFailed)
+      .then(result => { if (authFailed) { result.cleanup?.(); return; } show(result, 'Google Maps'); }).catch(unavailable);
     const click = event => {
       const trigger = event.target.closest('[data-action="place:view"]');
       if (trigger) callbacks.current.onOpenPlace?.(trigger.dataset.placeId);
@@ -78,7 +97,7 @@ export function MapPanel({ places, subject = 'place', onOpenPlace, selectedPlace
     node.addEventListener('click', click);
     return () => {
       cancelled = true;
-      window.removeEventListener('travelm:google-auth-failure', fallback);
+      window.removeEventListener('travelm:google-auth-failure', unavailable);
       node.removeEventListener('click', click);
       cleanup?.();
       controller.current = null;
@@ -97,7 +116,8 @@ export function MapPanel({ places, subject = 'place', onOpenPlace, selectedPlace
         </button>
       </div>
       <div className="tm-location-toolbar">
-        <button type="button" className="tm-focus tm-locate-button" onClick={locate} disabled={locationState.busy}><Navigation size={14} aria-hidden="true" />{locationState.busy ? 'Locating…' : 'Use my location'}</button>
+        <button type="button" className="tm-focus tm-locate-button" onClick={locate} disabled={locationState.busy}><Navigation size={14} aria-hidden="true" />{locationState.busy ? 'Locating…' : locationState.active ? (position.current ? 'Recenter on me' : 'Retry location') : 'Use my location'}</button>
+        {locationState.active ? <button type="button" className="tm-focus tm-locate-button" onClick={stopLocation}>Stop location</button> : null}
         <span role="status">{locationState.message || 'With your permission, show your position on the map.'}</span>
       </div>
       <div className={`relative overflow-hidden ${heightClass}`}>

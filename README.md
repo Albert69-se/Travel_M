@@ -6,23 +6,33 @@ prototype that lives in [`Travel_M`](../Travel_M).
 
 Live: <https://travel-m.xcalibur.space>
 
-## Current prototype release — 25 October 2026
+## Current source changes — 26 October 2026
 
 Source: https://github.com/Albert69-se/Travel_M_React (student account; separate from the legacy Travel_M repository).
 
 - Redesigned warm-neutral/teal shell, illustrated home page, larger controls and responsive Discover workspace.
-- Country maps show numbered regional groups. Selecting a group zooms in; **Show on map** focuses a card; **All results** restores the result bounds. Both Google Maps and Leaflet support these controls.
-- **Use my location** requests browser geolocation permission on demand. A blue dot and accuracy area show the result. Denied, unavailable and timeout states are explained. Coordinates stay in memory, are not saved to account records, and the map provider receives the viewport needed to display the area.
-- Google Maps falls back to OpenStreetMap when unavailable. Each map owns its cleanup, including cancelled async loads and responsive resizes.
-- `npm test` runs 59 logic checks. Browser verification for this refresh is recorded in `docs/PROTOTYPE_REFRESH_AUDIT.md`.
+- Country maps show numbered regional groups. Selecting a group zooms in; **Show on map** focuses a card; **All results** restores the result bounds. These controls use Google Maps.
+- **Use my location** starts a high-accuracy browser position watch on demand. A blue dot and accuracy circle update as the device moves. Recenter and stop controls are available. Permission denial is explained; temporary signal loss clears the stale marker and waits for a new fix. HTTPS (or localhost) and device permission are required. Coordinates stay in memory, are not saved to account records, and the map provider receives the viewport needed to display the area.
+- Maps and discovery now use Google only, with explicit unavailable states. Empty search results still allow a map and live GPS. Each map owns its cleanup and stops the location watch when closed.
+- `npm test` covers location lifecycle, Google catalog normalization, deduplication and partial/error results alongside the existing app rules. Current work and validation are recorded in `docs/EXECPLAN_GPS_CATALOG.md`.
 
 ### Place photos and Google keys
 
-Google **Maps Demo Keys do not include user photos**, as documented at https://developers.google.com/maps/demo-key. Live inspection confirmed empty photo results with the configured demo key. Photo requests are therefore skipped in demo-only mode.
+Google's demo key excludes user-submitted photos. In demo-key mode, TravelM
+skips inaccessible Google photo requests and lazily attempts a Wikimedia
+Commons photo from a nearby, strongly matching Wikipedia article. The Commons
+file's artist, licence and source link are shown. Uncertain matches, missing
+licences and network failures keep an honest category illustration instead.
+Lookup concurrency is limited, and results are cached only in memory. Not
+every attraction has a suitable Wikimedia photograph.
 
 For API photos, an authorized standard key can be configured locally as `VITE_GOOGLE_MAPS_API_KEY` with Maps JavaScript API and Places API (New) enabled, appropriate HTTP-referrer/API restrictions and billing. That key takes precedence over `VITE_GOOGLE_MAPS_DEMO_KEY`. No credentials or billing configuration are changed by this release. Existing evaluation deployment safeguards remain in place; ordinary deployment of a standard-key build still requires explicit review of the deploy script's browser-key guard.
 
-With a standard key, photos load lazily from Google Places, with contributor credits. Google photo URLs and metadata are not persisted. Missing photos use existing credited sample images or category illustrations. Do not commit `.env.local` or any key; Vite browser keys are visible in deployed bundles by design.
+With an authorized standard key, exact-ID Google photos take precedence and
+include contributor credits; the Commons lookup is the fallback. Google photo
+URLs and metadata are not persisted. Existing credited sample images remain
+available. Do not commit `.env.local` or any key; Vite browser keys are
+visible in deployed bundles by design.
 
 ## Stack
 
@@ -32,9 +42,9 @@ With a standard key, photos load lazily from Google Places, with contributor cre
 | UI | React 19 + React Router 7 (`BrowserRouter`, real URLs) |
 | Styling | Tailwind CSS v4 with the design tokens in `src/styles/index.css` |
 | Icons | `lucide-react`, 1.5px stroked |
-| Maps | Local demo: Google Maps JavaScript API with a Maps Demo Key; public fallback: Leaflet 1.9.4 + OpenStreetMap |
-| Photographs | Google Places photo metadata requested on demand; credited author links. Wikimedia images remain only as fallback for eight demo records. No Google photos cached. |
-| Place data | 61 curated nationwide editorial attractions + eight legacy demo records; historical OSM archive accessed only for existing saved/trip references |
+| Maps | Google Maps JavaScript API; no OpenStreetMap fallback |
+| Photographs | Google Places on an authorized standard key; nearby identity-matched Wikipedia/Wikimedia Commons as free, credited fallback; category tile otherwise |
+| Place data | Up to 200 distinct live Google Places attractions across Thailand; exact Google IDs for saved references |
 | Weather | Open-Meteo, no API key |
 | Storage | `localStorage`, no backend |
 | Tests | Node's built-in runner (`node --test`) |
@@ -60,8 +70,7 @@ VITE_GOOGLE_MAPS_DEMO_KEY=your_demo_key_here
 
 Run `npm run dev` and open Discover or a place detail. The app loads Google
 Maps on demand, shows regional count groups below zoom 10, and renders at most 40
-visible markers at city-level zoom. It uses `DEMO_MAP_ID` for advanced markers. If Google is unavailable, it falls back
-to Leaflet/OpenStreetMap. Place detail also provides keyless official Google
+visible markers at city-level zoom. It uses `DEMO_MAP_ID` for advanced markers. If Google is unavailable, the app explains the failure and does not switch providers. Place detail also provides keyless official Google
 Maps links for viewing a location and getting directions.
 
 The hosted classroom-evaluation build at
@@ -77,7 +86,7 @@ allow evaluation/testing only; production use is prohibited. Any Vite
 by visitors, even when the source `.env.local` file is gitignored.
 Restrict/rotate keys as appropriate. For a production release, obtain a
 properly API- and referrer-restricted standard Google Maps key with billing
-enabled, or switch back to Leaflet/OpenStreetMap.
+enabled.
 
 The corrected React code now validates calendar dates strictly and refuses
 expenses that would round to zero. Tests: `node --test tests/logic.test.js`.
@@ -103,41 +112,48 @@ The original Stitch exports remain in `design/stitch/` as design history. The re
 `weather`, `auth`, `map`. Validation, PBKDF2 password hashing, per-user record
 isolation, budget maths, the 80% "nearing budget" threshold, and the map adapter's
 "why is there no map" decision function are the same code the prototype's tests
-cover. The `province` filter lives in `places.js`; `featured.js` defines a small
-nationwide editorial shortlist, while `thailand.js` resolves previously saved
-OSM IDs only on demand. `tests/logic.test.js` covers these rules.
+cover. The `province` filter lives in `places.js`; `google-places.js` normalizes API records and runs bounded discovery. Original sample/editorial IDs remain available for existing trips, outside public discovery. The retired OSM loader is no longer called by the application. `tests/logic.test.js` covers these rules.
 
 `src/app/lib/store.jsx` is the only place that touches `localStorage`: it calls a
 core function, stores the collection it returns, and re-reads the snapshot, so
 React state can never drift from the stored records.
 
-## Places: 61 nationwide editorial picks plus eight demo samples
+## Places: 200 Google Maps attractions
 
-The public Discover catalog uses a small curated selection of recognizable
-landmarks from Bangkok, Central/Northern/Northeastern/Eastern/Southern Thailand,
-plus eight long-standing Chiang Mai demo records. This is **not** an official
-visitor-count ranking. Editorial coordinates are approximate, and no entry fee
-or opening-hours claims are treated as current until independently verified.
-The 12,389-record OpenStreetMap extract is **retired from Discover**. It is
-retained at `public/data/thailand-places.json` only to recover specific old
-saved-place or itinerary references with stable `osm-*` identifiers, when needed.
-Ordinary visitors never download this 6 MB archive.
+Discover loads live Google Places API (New) results from regional attraction searches,
+deduplicates by place ID, and stops at 200 valid Thai attractions. Each search requests
+at most 20 results; the whole run is bounded to 22 regional queries. Partial results,
+authorization/network failures and quota errors are visible, with an explicit retry.
+Counts reflect actual returned places, with no demo or generated filler. Results and
+coordinates can change with Google rankings. Province names come from Google's address
+components, not editorial guesses.
+
+Google content stays in memory for the current tab. Saved places and trip destinations
+keep stable `google-*` IDs, and details are fetched again if a saved ID is absent from
+current discovery. Original sample/editorial records remain available to old trips but
+are not counted in Discover. The OSM dataset/import tools remain historical files;
+no application route fetches OSM data or tiles. Historical `osm-*` bookmarks are not
+automatically converted to Google IDs.
+
+See [Google Text Search](https://developers.google.com/maps/documentation/javascript/place-search)
+and [Places attribution and storage rules](https://developers.google.com/maps/documentation/places/web-service/policies).
 
 ### Google Places photos and marker visibility
 
-When a standard `VITE_GOOGLE_MAPS_API_KEY` is provided **and Places API (New) is enabled**, list
+When an authorized key is provided **and Places API (New) is enabled**, list
 photos and large detail photos load lazily via the Maps JavaScript Places
-library (`Place.searchByText`, `fetchFields({fields:['photos']})`,
+library (the attraction's exact place ID, `fetchFields({fields:['photos']})`,
 `getURI`). The app only keeps place ID matches in memory, never Google photo
 URIs/metadata, and shows required contributor attributions. It limits to two
 concurrent lookups to avoid burst requests. Missing photos or rejected Places
-API calls degrade to honest category thumbnails (or legacy Commons sample
-images), rather than unrelated pictures. Google Places searches and photo
-requests may incur charges and need appropriately restricted authorized keys.
+API calls use strictly matched, attributed Commons images where available;
+otherwise honest category thumbnails (or credited legacy images). Google
+Places searches and standard-key photo requests may incur charges and need
+appropriately restricted keys; demo-key photos are not available.
 
 At Thailand/regional zoom, **TravelM draws numbered geographic groups**; selecting one fits its places. At zoom 10+
 only in-viewport results render, capped at 40 pins, refreshing on pan/zoom for
-Google Maps and Leaflet/OpenStreetMap. Single-place detail maps always retain
+Google Maps. Single-place detail maps always retain
 one pin.
 
 ### Historical OSM archive (not part of discovery)
@@ -245,11 +261,9 @@ forecasts roughly 16 days ahead; when the trip is further out, the screen shows
 current conditions plus an explicit note that no forecast covers those dates. It
 never displays a guess.
 
-Maps are Leaflet + OpenStreetMap, also keyless, in two places (search results and a
-single place). The three "no map" situations — provider switched off, Leaflet did
-not load, no usable coordinates — are each explained in words. The OpenStreetMap
-Foundation's tile servers are public infrastructure intended for light use, not a
-production CDN, and that is stated in the interface.
+Maps use Google Maps in Discover and place details, including when filters return no
+attractions. A failed Google connection is shown explicitly. GPS locations are supplied
+by browser/device location services and are never saved to account storage.
 
 ## Honest differences from the generated design
 
@@ -258,11 +272,9 @@ The design and the data model do not fully agree, and the records win:
 1. **Activity times and durations.** The design shows `09:00 – 11:00` and a `2h`
    badge. An itinerary activity has **one date** and no start/end time, so no clock
    time or duration is rendered anywhere. Day grouping is real.
-2. **Place photographs.** The design shows photos, and each record now carries a
-   credited one in its `image` field — hotlinked from the Wikimedia Commons
-   thumbnail CDN, so no image file is stored or proxied by this project. The
-   licence requires attribution, which is printed beside the photo. `PlaceThumb`
-   stays as the fallback for a record without a photograph or a failed load.
+2. **Place photographs.** Google Places photos are requested using each destination's
+   exact ID, with contributor attribution. Missing or denied images use a category
+   placeholder. The eight historical demo records retain their credited sample images.
 3. **Categories.** The design shows six chips; the controlled vocabulary is
    `All, Nature, Culture, Food`, and that is what the filter renders. Expenses use
    the six real categories (`Food, Transport, Accommodation, Tickets, Shopping,

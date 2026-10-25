@@ -1,4 +1,6 @@
-import { requestLocation } from '../src/core/location.js';
+import { discoverGooglePlaces, normalizeGooglePlace } from '../src/core/google-places.js';
+import { normalizePhotoName, selectMatchingArticle, plainCredit } from '../src/core/commons-photo.js';
+import { requestLocation, watchLocation } from '../src/core/location.js';
 /**
  * Automated tests for the core application logic.
  *
@@ -60,6 +62,19 @@ const TRIP = {
   expectedBudget: 5000,
   currencyCode: 'THB',
 };
+
+test('open-photo matching accepts only a nearby matching landmark, never a neighbour', () => {
+  const pages = [
+    { title: 'Doi Suthep–Pui National Park', dist: 50, pageid: 20 },
+    { title: 'Wat Phra That Doi Suthep', dist: 80, pageid: 10 },
+    { title: 'Wat Phra That Doi Suthep', dist: 900, pageid: 30 },
+  ];
+  assert.equal(selectMatchingArticle('Wat Phra That Doi Suthep', pages)?.pageid, 10);
+  assert.equal(selectMatchingArticle('Unknown Night Market', pages), null);
+  assert.equal(selectMatchingArticle('Doi Suthep', [{ title: 'Doi Suthep–Pui National Park', dist: 100 }]), null);
+  assert.equal(normalizePhotoName('Wat Rong Khun (White Temple)'), 'wat rong khun');
+  assert.equal(plainCredit('<a href="test">Example Author</a> &amp; Team'), 'Example Author & Team');
+});
 
 /* -------------------------------------------------------------- utils ---- */
 
@@ -899,4 +914,139 @@ test('location errors distinguish denied, unavailable, timeout and unsupported c
   await assert.rejects(requestLocation(null), /HTTPS/);
   await assert.rejects(requestLocation({}, false), /HTTPS/);
   await assert.rejects(requestLocation({getCurrentPosition(success) { success({coords: {latitude: NaN, longitude: 0, accuracy: 2}}); }}), /unusable/);
+});
+
+// Live device location: lifecycle and error paths, independent of physical GPS.
+test('live location updates use fresh high-accuracy fixes and ignore callbacks after stop', () => {
+  let success;
+  const cleared = [];
+  const points = [];
+  const stop = watchLocation({
+    watchPosition(callback, _error, options) {
+      success = callback;
+      assert.equal(options.enableHighAccuracy, true);
+      assert.equal(options.maximumAge, 0);
+      assert.equal(options.timeout, 12000);
+      return 0;
+    },
+    clearWatch(id) { cleared.push(id); },
+  }, true, point => points.push(point), assert.fail);
+  success({ coords: { latitude: 13.75, longitude: 100.49, accuracy: 15 } });
+  success({ coords: { latitude: 18.78, longitude: 98.98, accuracy: 20 } });
+  assert.equal(points.length, 2);
+  stop(); stop();
+  success({ coords: { latitude: 0, longitude: 0, accuracy: 0 } });
+  assert.equal(points.length, 2);
+  assert.deepEqual(cleared, [0]);
+});
+
+test('live location stops on denial, invalid coordinates, and unsupported contexts', () => {
+  for (const code of [1]) {
+    let fail;
+    let cleared = 0;
+    let errors = 0;
+    const stop = watchLocation({
+      watchPosition(_success, error) { fail = error; return 7; },
+      clearWatch(id) { assert.equal(id, 7); cleared++; },
+    }, true, assert.fail, () => errors++);
+    fail({ code }); fail({ code }); stop();
+    assert.equal(errors, 1);
+    assert.equal(cleared, 1);
+  }
+  const errors = [];
+  let cleared = false;
+  watchLocation({
+    watchPosition(success) { success({ coords: { latitude: 91, longitude: 100, accuracy: 1 } }); return 3; },
+    clearWatch() { cleared = true; },
+  }, true, assert.fail, error => errors.push(error.message));
+  assert.equal(cleared, true);
+  assert.match(errors[0], /unusable/);
+  watchLocation({}, false, assert.fail, error => assert.match(error.message, /HTTPS/));
+});
+
+function googleFixture(id, overrides = {}) {
+  return {
+    id, displayName: `Attraction ${id}`, location: { lat: () => 13.75, lng: () => 100.49 },
+    addressComponents: [
+      { types: ['country'], shortText: 'TH', longText: 'Thailand' },
+      { types: ['administrative_area_level_1'], longText: 'Chiang Mai Province' },
+    ], types: ['tourist_attraction', 'national_park'],
+    attributions: [{ provider: 'Example provider', providerURI: 'https://example.com' }],
+    ...overrides,
+  };
+}
+
+test('Google catalog normalizes exact IDs, source attribution, categories and Thai coordinates', () => {
+  const record = normalizeGooglePlace(googleFixture('abc'));
+  assert.equal(record.id, 'google-abc');
+  assert.equal(record.googlePlaceId, 'abc');
+  assert.equal(record.administrativeArea, 'Chiang Mai');
+  assert.equal(record.category, 'Nature');
+  assert.equal(record.estimatedCost, null);
+  assert.equal(record.attributions[0].provider, 'Example provider');
+  assert.match(record.sourceReference, /Google/);
+  assert.equal(normalizeGooglePlace(googleFixture('abc', { businessStatus: 'CLOSED_PERMANENTLY' })), null);
+  assert.equal(normalizeGooglePlace(googleFixture('abc', { addressComponents: [] })), null);
+  assert.equal(normalizeGooglePlace(googleFixture('abc', { location: { lat: NaN, lng: 100 } })), null);
+});
+
+test('Google discovery reaches 200 distinct places with bounded calls and no filler records', async () => {
+  let calls = 0;
+  const result = await discoverGooglePlaces({ async searchByText(request) {
+    assert.equal(request.maxResultCount, 20);
+    assert.equal(request.includedType, 'tourist_attraction');
+    assert.equal(request.useStrictTypeFiltering, true);
+    calls++;
+    // One shared ID on every page ensures discovery must continue past 10 calls.
+    return { places: [googleFixture('shared'), ...Array.from({ length: 19 }, (_, i) => googleFixture(`${calls}-${i}`))] };
+  }});
+  assert.equal(result.status, 'ok');
+  assert.equal(result.places.length, 200);
+  assert.equal(new Set(result.places.map(place => place.id)).size, 200);
+  assert.equal(calls, 11);
+  assert.ok(result.places.every(place => place.googlePlaceId));
+});
+
+test('Google discovery reports partial/failed results honestly and stops after API failure', async () => {
+  let calls = 0;
+  const partial = await discoverGooglePlaces({ async searchByText() {
+    if (++calls === 1) return { places: [googleFixture('one')] };
+    throw new Error('quota');
+  }});
+  assert.equal(partial.status, 'partial');
+  assert.equal(partial.places.length, 1);
+  assert.match(partial.message, /1\/200/);
+  assert.equal(calls, 2);
+  const failed = await discoverGooglePlaces({ async searchByText() { throw new Error('denied'); } });
+  assert.equal(failed.status, 'error');
+  assert.equal(failed.places.length, 0);
+  const sparse = await discoverGooglePlaces({ async searchByText() { return { places: [googleFixture('same')] }; } });
+  assert.equal(sparse.status, 'partial');
+  assert.equal(sparse.places.length, 1);
+});
+
+test('Google directions preserve the exact place ID', () => {
+  const place = normalizeGooglePlace(googleFixture('exact_id'));
+  assert.equal(new URL(mapsPlaceUrl(place)).searchParams.get('query_place_id'), 'exact_id');
+  assert.equal(new URL(mapsDirectionsUrl(place)).searchParams.get('destination_place_id'), 'exact_id');
+});
+
+
+test('live location survives transient signal loss and clears only when stopped', () => {
+  let success, failure;
+  const received = [];
+  const errors = [];
+  let cleared = 0;
+  const stop = watchLocation({
+    watchPosition(ok, fail) { success = ok; failure = fail; return 9; },
+    clearWatch() { cleared++; },
+  }, true, point => received.push(point), (error, recovering) => errors.push({ error, recovering }));
+  success({ coords: { latitude: 13, longitude: 100, accuracy: 15 } });
+  failure({ code: 2 }); failure({ code: 3 });
+  success({ coords: { latitude: 18, longitude: 99, accuracy: 20 } });
+  assert.equal(received.length, 2);
+  assert.ok(errors.every(error => error.recovering));
+  assert.equal(cleared, 0);
+  stop();
+  assert.equal(cleared, 1);
 });

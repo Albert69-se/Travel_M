@@ -199,7 +199,7 @@ button, a, input, select { touch-action: manipulation; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
 
-.tm-location-toolbar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--color-line); font-size: 11px; line-height: 16px; color: var(--color-ink-secondary); }
+.tm-location-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--color-line); font-size: 11px; line-height: 16px; color: var(--color-ink-secondary); }
 .tm-locate-button { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; background: var(--color-tint); color: var(--color-accent); padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; }
 .tm-locate-button:disabled { opacity: .6; cursor: wait; }
 .tm-location-pin { height: 18px; width: 18px; background: #2563eb; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 5px #2563eb25; }

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { MapPanel } from '../components/MapPanel.jsx';
+import { GoogleAttribution } from '../components/GoogleAttribution.jsx';
 import { PlacePhoto } from '../components/PlacePhoto.jsx';
 import {
   Button,
@@ -51,7 +52,7 @@ const PAGE_SIZE = 24;
 /**
  * From `lg` both panes are shown side by side, so the list and map panes are
  * rendered together; below that only the selected pane is mounted. Mounting a
- * map into a `display: none` container leaves Leaflet with nothing to measure,
+ * map into a `display: none` container leaves the map with nothing to measure,
  * which is why the choice is made in JavaScript rather than with a hidden class.
  */
 function useWideScreen() {
@@ -89,6 +90,7 @@ function PlaceRow({ place, saved, onToggleSaved, selected, onSelect }) {
         </div>
         <p className="mt-1 text-label text-ink-secondary">{place.locality || place.administrativeArea} · {place.category}</p>
         <button type="button" className="tm-show-map tm-focus" aria-pressed={selected} onClick={onSelect}><MapPin size={12} /> Show on map <ArrowUpRight size={12} /></button>
+        <GoogleAttribution place={place} />
       </div>
 
       <IconButton
@@ -107,7 +109,7 @@ function PlaceRow({ place, saved, onToggleSaved, selected, onSelect }) {
 
 export default function DiscoverView() {
   const navigate = useNavigate();
-  const { places, placeImport, user, isPlaceSaved, toggleSavedPlace, setStatus } = useData();
+  const { places, placeImport, retryPlaceImport, user, isPlaceSaved, toggleSavedPlace, setStatus } = useData();
 
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [query, setQuery] = useState('');
@@ -116,7 +118,7 @@ export default function DiscoverView() {
   const [view, setView] = useState('list');
   const [showFilters, setShowFilters] = useState(true);
   const [saveMessage, setSaveMessage] = useState('');
-  // Limit rendered rows even for the small curated catalog.
+  // Paginate the Google catalog while mapping all matching results.
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const wide = useWideScreen();
@@ -140,12 +142,9 @@ export default function DiscoverView() {
 
   // What the header says about where the records came from, honestly per
   // import state — never presented as if the samples were everything.
-  const sampleCount = publicPlaces.length - placeImport.places.length;
-  const importLabel = placeImport.status === 'ok'
-    ? `${placeImport.places.length} editorial picks + ${sampleCount} demo places`
-    : placeImport.status === 'loading'
-      ? 'Loading curated places'
-      : 'Curated places unavailable; demo places shown';
+  const importLabel = placeImport.status === 'loading'
+    ? `Loading Google Maps attractions · ${publicPlaces.length}/200`
+    : `${publicPlaces.length} attractions from Google Maps`;
 
   const showList = wide || view === 'list';
   const showMap = wide || view === 'map';
@@ -287,10 +286,10 @@ export default function DiscoverView() {
         </div>
       ) : null}
 
-      {placeImport.status === 'error' ? (
+      {['error', 'partial'].includes(placeImport.status) ? (
         <div className="mt-3">
           <Notice tone="warning" icon={TriangleAlert}>
-            {placeImport.message} Existing demo places and saved trips are unaffected.
+            {placeImport.message} <button type="button" className="tm-focus underline" onClick={retryPlaceImport}>Retry loading places</button>
           </Notice>
         </div>
       ) : null}
@@ -308,8 +307,8 @@ export default function DiscoverView() {
             {results.length === 0 ? (
               <EmptyState
                 icon={MapPinOff}
-                title="No places match these filters"
-                description="Nothing in the records matches the current search, category and province. Clear the filters to see every place again."
+                title={placeImport.status === 'loading' ? 'Loading Google Maps attractions…' : 'No places match these filters'}
+                description={placeImport.status === 'loading' ? 'Attractions will appear as Google Places responds.' : 'Clear the filters or retry loading places if Google Places is unavailable.'}
                 action={
                   <Button variant="secondary" icon={RotateCcw} onClick={clearFilters}>
                     Clear filters
@@ -343,7 +342,7 @@ export default function DiscoverView() {
 
             <div className="border-t border-line px-4 py-2.5">
               <FinePrint>
-                {importLabel}. Coordinates and fees are approximate; check before visiting.
+                {importLabel}. Opening hours and fees can change; check before visiting.
               </FinePrint>
             </div>
           </Card>

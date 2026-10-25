@@ -13,10 +13,12 @@ function destination(place) {
 
 export function mapsPlaceUrl(place) {
   const params = new URLSearchParams({ api: '1', query: destination(place) });
+  if (place?.googlePlaceId) params.set('query_place_id', place.googlePlaceId);
   return `https://www.google.com/maps/search/?${params}`;
 }
 
 export function mapsDirectionsUrl(place) {
   const params = new URLSearchParams({ api: '1', destination: destination(place) });
+  if (place?.googlePlaceId) params.set('destination_place_id', place.googlePlaceId);
   return `https://www.google.com/maps/dir/?${params}`;
 }

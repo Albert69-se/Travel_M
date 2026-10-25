@@ -43,6 +43,7 @@ import {
   Row,
   Stat,
 } from '../components/ui.jsx';
+import { GoogleAttribution } from '../components/GoogleAttribution.jsx';
 import { PlacePhoto } from '../components/PlacePhoto.jsx';
 import { useData, useTripData } from '../lib/store.jsx';
 import {
@@ -514,7 +515,7 @@ function CredentialPanel() {
 
 function GuestHome() {
   const { places } = useData();
-  const featured = places.filter(p => !p.archived && p.image).slice(0, 4);
+  const featured = places.filter(p => !p.archived).slice(0, 4);
   return (
     <div className="flex flex-col gap-4">
       <section className="tm-hero">
@@ -548,6 +549,7 @@ function GuestHome() {
           {featured.map((place, i) => <Card key={place.id} className="tm-feature-card">
             <div className="flex items-center justify-between"><span className="tm-feature-number">0{i + 1} / {place.category}</span><MapPin size={15} className="text-accent" /></div>
             <PlacePhoto place={place} size={90} />
+            <GoogleAttribution place={place} />
             <div><h3><Link to={`/discover/${place.id}`} className="tm-focus hover:text-accent">{place.name}</Link></h3><p className="mt-1 text-label text-ink-secondary">{place.locality}</p></div>
           </Card>)}
         </div>

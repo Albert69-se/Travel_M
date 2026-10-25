@@ -169,8 +169,9 @@ Hard rules:
    days:[{date, maxTemperature, minTemperature, precipitation, condition}], note }`;
    `unavailable` → `{ message }`; `error` → `{ message }`. Each gets its own visible state. Never show
    an empty box and never invent a temperature.
-8. Maps: only via `MapPanel`. It already renders the reason when the provider is switched off, Leaflet
-   did not load, or the records have no usable coordinates.
+8. Maps: only via `MapPanel`, using Google Maps with no OSM fallback. Explain Google load failures;
+   an empty result set still shows a map for device location. Discovery uses Google Places records
+   in memory, with Google attribution and exact-ID photo lookups. Stop GPS watches on unmount.
 
 ## 6. Layout and responsiveness
 

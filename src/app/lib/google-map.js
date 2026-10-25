@@ -9,6 +9,8 @@ import {
 const STANDARD_KEY = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY || '';
 const KEY = STANDARD_KEY || import.meta.env?.VITE_GOOGLE_MAPS_DEMO_KEY || '';
 
+// A demo key can render maps and fetch place data, but explicitly excludes
+// user-contributed photos. Do not waste requests on photos it cannot return.
 export function googlePlacePhotosEnabled() { return Boolean(STANDARD_KEY.trim()); }
 let libraryPromise;
 let authRejected = false;
@@ -72,15 +74,15 @@ export function loadGoogleMapsLibrary() {
  */
 export async function mountGoogleDemoMap(container, places, onOpenPlace, onMarkerChange, isCancelled = () => false) {
   const mappable = getMappablePlaces(places);
-  if (!container || !mappable.length) return { ok: false, reason: 'No locations with usable coordinates.' };
+  if (!container) return { ok: false, reason: 'No locations with usable coordinates.' };
   const maps = await loadGoogleMapsLibrary();
   if (isCancelled() || !container.isConnected) return { ok: false, reason: 'Map view is no longer active.' };
 
   const { AdvancedMarkerElement } = await maps.importLibrary('marker');
   if (isCancelled() || !container.isConnected) return { ok: false };
   const map = new maps.Map(container, {
-    center: { lat: mappable[0].latitude, lng: mappable[0].longitude },
-    zoom: 13,
+    center: { lat: mappable[0]?.latitude ?? 13.75, lng: mappable[0]?.longitude ?? 100.5 },
+    zoom: mappable.length ? 13 : 6,
     mapId: 'DEMO_MAP_ID',
     streetViewControl: false,
     mapTypeControl: false,
@@ -168,22 +170,34 @@ export async function mountGoogleDemoMap(container, places, onOpenPlace, onMarke
     refreshPins();
   });
   if (mappable.length > 1) map.fitBounds(bounds, 28);
-  else map.setCenter({ lat: mappable[0].latitude, lng: mappable[0].longitude });
+  else if (mappable.length) map.setCenter({ lat: mappable[0].latitude, lng: mappable[0].longitude });
 
   return {
     ok: true,
     showLocation(point, center = true) {
-      if (locationMarker) locationMarker.map = null;
-      accuracyCircle?.setMap(null);
       const position = { lat: point.latitude, lng: point.longitude };
-      const dot = document.createElement('div');
-      dot.className = 'tm-location-pin';
-      locationMarker = new AdvancedMarkerElement({ map, position, content: dot, title: 'Your location' });
-      accuracyCircle = new maps.Circle({ map, center: position, radius: point.accuracy, strokeColor: '#2563eb', strokeWeight: 1, fillColor: '#2563eb', fillOpacity: 0.1, clickable: false });
+      if (locationMarker) {
+        locationMarker.position = position;
+        locationMarker.map = map;
+        accuracyCircle.setMap(map);
+        accuracyCircle.setCenter(position);
+        accuracyCircle.setRadius(point.accuracy);
+      } else {
+        const dot = document.createElement('div');
+        dot.className = 'tm-location-pin';
+        dot.setAttribute('aria-label', 'Your location');
+        locationMarker = new AdvancedMarkerElement({ map, position, content: dot, title: 'Your location' });
+        accuracyCircle = new maps.Circle({ map, center: position, radius: point.accuracy, strokeColor: '#2563eb', strokeWeight: 1, fillColor: '#2563eb', fillOpacity: 0.1, clickable: false });
+      }
       if (center) { pendingFocus = point; map.setCenter(position); map.setZoom(14); }
     },
+    clearLocation() {
+      if (locationMarker) locationMarker.map = null;
+      accuracyCircle?.setMap(null);
+      pendingFocus = null;
+    },
     focusPlace(place) { pendingFocus = place; map.setCenter({lat: place.latitude, lng: place.longitude}); map.setZoom(14); },
-    fitResults() { pendingFocus = null; map.fitBounds(bounds, 40); if (mappable.length === 1) map.setZoom(14); },
+    fitResults() { pendingFocus = null; if (!mappable.length) return; map.fitBounds(bounds, 40); if (mappable.length === 1) map.setZoom(14); },
     markerCount: 0,
     totalCount: mappable.length,
     cleanup() {

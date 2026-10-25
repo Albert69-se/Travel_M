@@ -16,7 +16,8 @@ import * as packingApi from '../../core/packing.js';
 import * as placesApi from '../../core/places.js';
 import * as tripsApi from '../../core/trips.js';
 import * as storage from '../../core/storage.js';
-import { loadReferencedLegacyPlaces, loadThailandPlaces } from '../../core/thailand.js';
+import { POPULAR_THAILAND_PLACES } from '../../core/featured.js';
+import { subscribeGoogleCatalog, loadGoogleCatalog, resolveGooglePlace } from './google-places.js';
 
 const { STORAGE_KEYS: KEYS } = storage;
 
@@ -40,11 +41,10 @@ export function DataProvider({ children }) {
   const [ready, setReady] = useState(false);
   const [status, setStatusState] = useState(null);
   /**
-   * The curated Thailand set is bundled and intentionally not persisted.
-   * Archived OSM records are loaded only when an existing link references them.
+   * Live Google Places content stays in memory; bookmarks keep only stable IDs.
    */
   const [placeImport, setPlaceImport] = useState({ status: 'loading', places: [], meta: null, message: '' });
-  const [legacyReferences, setLegacyReferences] = useState([]);
+  const [googleReferences, setGoogleReferences] = useState([]);
 
   const refresh = useCallback(() => setData(readSnapshot()), []);
 
@@ -71,30 +71,31 @@ export function DataProvider({ children }) {
     };
   }, [refresh]);
 
-  // The curated place list loads in memory, with an explicit status.
-  useEffect(() => {
-    let cancelled = false;
-    loadThailandPlaces().then((result) => {
-      if (!cancelled) setPlaceImport(result);
-    });
-    return () => {
-      cancelled = true;
-    };
+  useEffect(() => subscribeGoogleCatalog(setPlaceImport), []);
+
+  const ensureGooglePlace = useCallback(async id => {
+    const place = await resolveGooglePlace(id);
+    if (place) setGoogleReferences(current => current.some(entry => entry.id === id) ? current : [...current, place]);
+    return place;
   }, []);
-
-  const legacyIds = useMemo(() => [
-    ...data.savedPlaces.map((entry) => entry.placeId),
-    ...data.itinerary.map((entry) => entry.placeId),
-    ...data.trips.map((entry) => entry.destinationId),
-  ].filter((id) => typeof id === 'string' && id.startsWith('osm-')).sort().join('|'), [data.savedPlaces, data.itinerary, data.trips]);
-
+  const retryPlaceImport = useCallback(() => loadGoogleCatalog(true), []);
+  const referencedIds = useMemo(() => [...new Set([
+    ...data.savedPlaces.map(entry => entry.placeId),
+    ...data.itinerary.map(entry => entry.placeId),
+    ...data.trips.map(entry => entry.destinationId),
+  ].filter(id => typeof id === 'string' && id.startsWith('google-')))].sort().join('|'), [data.savedPlaces, data.itinerary, data.trips]);
   useEffect(() => {
+    if (!referencedIds || placeImport.status === 'loading') return;
     let cancelled = false;
-    loadReferencedLegacyPlaces(legacyIds ? legacyIds.split('|') : []).then((results) => {
-      if (!cancelled) setLegacyReferences(results);
-    });
+    // Sequential detail recovery keeps reloads of large saved lists bounded.
+    (async () => {
+      for (const id of referencedIds.split('|')) {
+        if (cancelled) return;
+        await ensureGooglePlace(id);
+      }
+    })();
     return () => { cancelled = true; };
-  }, [legacyIds]);
+  }, [referencedIds, placeImport.status, ensureGooglePlace]);
 
   const user = useMemo(
     () => auth.resolveSession(data.session, data.users),
@@ -351,12 +352,16 @@ export function DataProvider({ children }) {
   }, [refresh, setStatus]);
 
   /**
-   * Seeded samples, editorial places and any referenced OSM legacy records
-   * are available for lookup; Discover itself excludes archived records.
+   * Old sample/editorial IDs remain available for existing trips.
+   * Discover shows only live Google Places records.
    */
   const places = useMemo(
-    () => [...placeImport.places, ...data.places, ...legacyReferences],
-    [data.places, placeImport.places, legacyReferences],
+    () => [...new Map([
+      ...[...data.places, ...POPULAR_THAILAND_PLACES].map(place => [place.id, { ...place, archived: true }]),
+      ...googleReferences.map(place => [place.id, { ...place, archived: true }]),
+      ...placeImport.places.map(place => [place.id, place]),
+    ]).values()],
+    [data.places, placeImport.places, googleReferences],
   );
 
   const value = useMemo(
@@ -368,6 +373,8 @@ export function DataProvider({ children }) {
       users: data.users,
       places,
       placeImport,
+      retryPlaceImport,
+      ensureGooglePlace,
       savedPlaces: data.savedPlaces,
       trips: data.trips,
       itinerary: data.itinerary,
@@ -397,7 +404,7 @@ export function DataProvider({ children }) {
       resetData,
     }),
     [
-      ready, status, setStatus, user, data, places, placeImport, signIn, signInAsDemo, register, signOut, isPlaceSaved,
+      ready, status, setStatus, user, data, places, placeImport, ensureGooglePlace, retryPlaceImport, signIn, signInAsDemo, register, signOut, isPlaceSaved,
       toggleSavedPlace, createTrip, updateTrip, deleteTrip, addActivity, updateActivity,
       deleteActivity, moveActivity, addPackingItem, togglePackingItem, renamePackingItem,
       deletePackingItem, suggestPackingItems, addExpense, updateExpense, deleteExpense, resetData,

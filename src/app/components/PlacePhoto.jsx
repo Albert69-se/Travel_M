@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 
 import { PlaceThumb } from './PlaceThumb.jsx';
 import { fetchGooglePlacePhoto, hasGooglePlacePhotos } from '../lib/google-photos.js';
+import { fetchCommonsPhoto } from '../lib/commons-photo.js';
 
 /**
- * Photos come from Google Places only when the image is near the viewport.
- * Google photo URLs are ephemeral and are never stored outside this component.
- * Author attribution accompanies every full-size photo.
+ * Near-viewport photos come from licensed Google Places when available, or a
+ * strictly matched Wikipedia/Commons article without requiring GCP billing.
+ * Source and author attribution always travel with the chosen image.
  */
 export function PlacePhoto({ place, size = 56, className = '', hero = false }) {
   const rootRef = useRef(null);
@@ -16,13 +17,16 @@ export function PlacePhoto({ place, size = 56, className = '', hero = false }) {
   const result = imageResult?.id === id ? imageResult.photo : null;
 
   useEffect(() => {
-    if (!id || !hasGooglePlacePhotos()) return undefined;
+    if (!id || (!hasGooglePlacePhotos() && place?.image)) return undefined;
     let cancelled = false;
     const host = rootRef.current;
     if (!host) return undefined;
 
     const lookup = () => {
-      fetchGooglePlacePhoto(place, hero ? 1280 : Math.max(180, size * 3))
+      (hasGooglePlacePhotos()
+        ? fetchGooglePlacePhoto(place, hero ? 1280 : Math.max(180, size * 3)).catch(() => null)
+        : Promise.resolve(null))
+        .then((photo) => photo || (place.image ? null : fetchCommonsPhoto(place)))
         .then((photo) => {
           if (!cancelled) setImageResult({ id, photo });
         })
@@ -53,7 +57,8 @@ export function PlacePhoto({ place, size = 56, className = '', hero = false }) {
 
   const fallback = place?.image || null;
   const src = result?.src || (hero ? fallback?.large : fallback?.thumb);
-  const googlePhoto = Boolean(result?.src);
+  const commonsPhoto = result?.provider === 'Wikimedia Commons';
+  const googlePhoto = Boolean(result?.src) && !commonsPhoto;
   const usable = src && brokenSource !== src;
 
   if (hero) {
@@ -70,12 +75,17 @@ export function PlacePhoto({ place, size = 56, className = '', hero = false }) {
           />
         ) : (
           <div className="flex aspect-[16/9] items-center justify-center bg-canvas px-4 text-center text-body text-ink-tertiary">
-            {hasGooglePlacePhotos() ? 'Google Maps photo unavailable for this place' : 'Place photo unavailable'}
+            Place photo unavailable — no confidently matched licensed image
           </div>
         )}
         {usable ? (
           <div className="border-t border-line px-4 py-2.5 text-label text-ink-secondary">
-            {googlePhoto ? (
+            {commonsPhoto ? (
+              <>
+                Photo: {result.credit} · {result.licence}
+                {' · '}<a href={result.source} className="underline" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>
+              </>
+            ) : googlePhoto ? (
               <>
                 Photo from Google Maps
                 {result.authors.length ? ' · Photo by ' : ''}
@@ -125,7 +135,12 @@ export function PlacePhoto({ place, size = 56, className = '', hero = false }) {
       ) : (
         <PlaceThumb place={place} size={size} className="h-full w-full" />
       )}
-      {googlePhoto && usable && result.authors.length ? (
+      {commonsPhoto && usable ? (
+        <a href={result.source} target="_blank" rel="noopener noreferrer"
+          title={`Photo: ${result.credit} · ${result.licence}`}
+          className="absolute inset-x-0 bottom-0 block truncate bg-black/65 px-0.5 text-center text-[10px] leading-tight text-white underline"
+        >{result.credit} · {result.licence}</a>
+      ) : googlePhoto && usable && result.authors.length ? (
         <span
           className="absolute inset-x-0 bottom-0 block truncate bg-black/65 px-0.5 py-0.5 text-center text-[10px] leading-tight text-white"
         >

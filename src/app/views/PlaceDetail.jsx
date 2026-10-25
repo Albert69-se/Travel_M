@@ -38,6 +38,7 @@ import {
 } from '../components/ui.jsx';
 import { formatCoordinates } from '../../core/map.js';
 import { mapsDirectionsUrl, mapsPlaceUrl } from '../../core/google-maps-links.js';
+import { GoogleAttribution } from '../components/GoogleAttribution.jsx';
 import { describeProvenance, getPlaceById } from '../../core/places.js';
 import { getWeatherForPlace, hasTemperature } from '../../core/weather.js';
 import { money } from '../lib/format.js';
@@ -152,9 +153,17 @@ function WeatherStrip({ weather }) {
 export default function PlaceDetailView() {
   const { placeId } = useParams();
   const navigate = useNavigate();
-  const { places, placeImport, user, isPlaceSaved, toggleSavedPlace, setStatus } = useData();
+  const { places, placeImport, ensureGooglePlace, user, isPlaceSaved, toggleSavedPlace, setStatus } = useData();
 
   const place = getPlaceById(places, placeId);
+  const [resolvedId, setResolvedId] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!place && placeId.startsWith('google-')) {
+      ensureGooglePlace(placeId).finally(() => { if (!cancelled) setResolvedId(placeId); });
+    }
+    return () => { cancelled = true; };
+  }, [placeId, place, ensureGooglePlace]);
   // Called unconditionally: the "not found" branch below must not change the
   // number of hooks between renders.
   const weather = usePlaceWeather(place);
@@ -163,7 +172,7 @@ export default function PlaceDetailView() {
 
   // The editorial records can arrive after the first render; avoid a
   // misleading not-found message while the curated list loads.
-  if (!place && placeImport.status === 'loading') {
+  if (!place && (placeImport.status === 'loading' || (placeId.startsWith('google-') && resolvedId !== placeId))) {
     return (
       <div>
         <Link
@@ -178,7 +187,7 @@ export default function PlaceDetailView() {
           <div className="min-w-0">
             <h1 className="text-title font-semibold text-ink">Loading place records…</h1>
             <p className="mt-1 text-body text-ink-secondary">
-              The curated places list is still loading. If this destination is in the published shortlist, it will appear shortly.
+              Fetching this destination from Google Places. It will appear when its details arrive.
             </p>
           </div>
         </header>
@@ -320,7 +329,8 @@ export default function PlaceDetailView() {
                 <dd className="font-medium">{provenance.status}</dd>
               </dl>
             </Notice>
-            <FinePrint className="px-1">Editorial locations are approximate until checked; archived OSM entries remain unverified.</FinePrint>
+            <GoogleAttribution place={place} />
+            <FinePrint className="px-1">Check current access, opening hours and fees before visiting.</FinePrint>
           </div>
 
           <Card padded={false} className="overflow-hidden">
@@ -374,7 +384,7 @@ export default function PlaceDetailView() {
               heightClass="h-[320px] lg:h-[420px]"
             />
             <FinePrint>
-              In-app map uses Google Maps in local demo mode, otherwise OpenStreetMap (© contributors). Attraction coordinates are not field-verified.
+              Map provided by Google Maps. Use “Use my location” to show your device’s position with your permission.
             </FinePrint>
             <div className="flex flex-wrap gap-3 text-label font-medium text-accent">
               <a className="tm-focus rounded-control underline" href={mapsPlaceUrl(place)} target="_blank" rel="noopener noreferrer">

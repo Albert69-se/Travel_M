@@ -15,6 +15,7 @@ import {
   findPlaces,
   getPlaceById,
   getSavedPlaces,
+  isPlaceVerified,
   isPlaceSaved,
   removeSavedPlace,
   savePlace,
@@ -24,6 +25,21 @@ import * as itineraryApi from './itinerary.js';
 import * as packingApi from './packing.js';
 import * as expensesApi from './expenses.js';
 import { getWeatherForPlace, hasTemperature } from './weather.js';
+import {
+  ACTIVE_MAP_MODE,
+  describeAvailability,
+  describeProvider,
+  isLeafletAvailable,
+  mountMap,
+  releaseMountedMaps,
+} from './map.js';
+import {
+  googleMapsSearchUrl,
+  googleMapsDirectionsUrl,
+  readLocalGoogleMapsKey,
+  mountGoogleMap,
+  releaseGoogleMaps,
+} from './google-maps.js';
 
 const state = {
   places: [],
@@ -43,6 +59,9 @@ const state = {
   loginOpen: false,
   formErrors: {},
   weather: { tripId: null, loading: false, result: null },
+  placeWeather: { placeId: null, loading: false, result: null },
+  googleMapsKey: null,
+  storageError: '',
   status: '',
 };
 
@@ -65,9 +84,15 @@ function loadData() {
 }
 
 function save(keys) {
+  let failed = false;
   for (const key of keys) {
-    storageApi.writeList(storageApi.STORAGE_KEYS[key], state[key]);
+    if (!storageApi.writeList(storageApi.STORAGE_KEYS[key], state[key])) failed = true;
   }
+  state.storageError = failed
+    ? 'Storage is unavailable or full. Your recent changes may NOT be saved. Export or copy important trip details before closing this tab.'
+    : '';
+  if (failed) statusLine.textContent = state.storageError;
+  return !failed;
 }
 
 function isMember() {
@@ -86,8 +111,8 @@ function activeTrip() {
 }
 
 function setStatus(message) {
-  state.status = message;
-  statusLine.textContent = message;
+  state.status = state.storageError || message;
+  statusLine.textContent = state.status;
 }
 
 /* ----------------------------------------------------------- primitives --- */
@@ -159,17 +184,63 @@ function provenanceBlock(place) {
   return el('div', { className: 'provenance' }, [
     el('p', { className: 'label', text: 'SOURCE & FRESHNESS' }),
     el('p', { text: `${source} · ${checked} · content status: ${status}` }),
-    ['draft', 'needs_update'].includes(place.contentStatus)
-      ? el('p', { className: 'notice', text: 'Not verified — this record still needs a source and review.' })
+    !isPlaceVerified(place)
+      ? el('p', { className: 'notice', text: 'Not independently verified — confirm location, opening hours and fees with an authoritative source before visiting.' })
       : null,
   ]);
 }
 
-function mapPlaceholder(context) {
+/**
+ * The fallback for the map, used only with a stated reason: a provider switched
+ * off, a library that did not load, or records with no usable coordinates.
+ */
+function mapPlaceholder(reason) {
   return el('div', { className: 'map-placeholder' }, [
-    el('p', { className: 'label', text: 'MAP PLACEHOLDER' }),
-    el('p', { text: `No map provider is configured for this prototype, so ${context} cannot be shown on a map.` }),
+    el('p', { className: 'label', text: 'MAP UNAVAILABLE' }),
+    el('p', { text: reason }),
   ]);
+}
+
+/**
+ * Builds the map panel around an empty canvas. Leaflet needs a container that is
+ * already in the document and has a measurable size, so the canvas is filled by
+ * mountMaps() once the view is on the page.
+ */
+function mapPanel({ title, places, context, subject }) {
+  const useGoogle = Boolean(state.googleMapsKey);
+  const availability = describeAvailability({
+    mode: ACTIVE_MAP_MODE,
+    leafletAvailable: useGoogle || isLeafletAvailable(),
+    places,
+    subject,
+  });
+  if (!availability.available) return mapPlaceholder(availability.reason);
+
+  const provider = describeProvider();
+  const canvas = el('div', {
+    className: 'map-canvas',
+    attrs: {
+      'data-map-places': places.map((place) => place.id).join(','),
+      'data-map-context': context,
+      'data-map-subject': subject,
+      'aria-label': `Map of ${places.length} place(s) drawn with ${useGoogle ? 'Google Maps' : 'OpenStreetMap'}`,
+    },
+  });
+
+  return panel(title, [
+    canvas,
+    useGoogle
+      ? el('p', { className: 'map-source', text: 'Map: Google Maps JavaScript API · Demo key for course prototyping, not production.' })
+      : el('p', { className: 'map-source' }, [
+          el('span', { text: `Map: ${provider.provider} · ${provider.tiles} · tiles © ` }),
+          el('a', {
+            text: 'OpenStreetMap',
+            attrs: { href: 'https://www.openstreetmap.org/copyright', target: '_blank', rel: 'noopener noreferrer' },
+          }),
+          el('span', { text: ' contributors. No API key or account is required.' }),
+        ]),
+    el('p', { className: 'hint', text: 'Pin positions use the coordinates recorded with each sample place. Nothing here has been field-verified.' }),
+  ], 'map-panel');
 }
 
 function budgetLine(trip) {
@@ -391,7 +462,7 @@ function renderDiscover() {
       el('h2', { text: 'Find places worth your time' }),
       el('p', { text: 'Browse sample records. Fees and details are estimates until verified.' }),
     ]),
-    mapPlaceholder('search results'),
+    mapPanel({ title: 'Search results on the map', places: results, context: 'discover', subject: 'search result' }),
     searchForm,
     chips,
     panel(`${results.length} place(s)`, [list]),
@@ -422,7 +493,18 @@ function renderPlaceDetails() {
       el('h2', { text: place.name }),
       el('p', { text: `${place.locality}, ${place.administrativeArea} · ${place.category}` }),
     ]),
-    mapPlaceholder('the location'),
+    mapPanel({ title: 'Where this is', places: [place], context: 'place', subject: 'place' }),
+    panel('Google Maps navigation', [
+      el('p', { className: 'hint', text: 'These links open Google Maps. Travel-M coordinates are samples until verified.' }),
+      el('div', { className: 'actions' }, [
+        el('a', { text: 'View on Google Maps', attrs: {
+          href: googleMapsSearchUrl(place), target: '_blank', rel: 'noopener noreferrer',
+        } }),
+        el('a', { text: 'Get directions', attrs: {
+          href: googleMapsDirectionsUrl(place), target: '_blank', rel: 'noopener noreferrer',
+        } }),
+      ]),
+    ]),
     panel('About', [el('p', { text: place.description })]),
     panel('Information status', [
       el('ul', { className: 'info-list' }, [
@@ -431,6 +513,10 @@ function renderPlaceDetails() {
         el('li', {}, [el('strong', { text: 'Opening hours' }), el('span', { text: 'Not verified' })]),
       ]),
       provenanceBlock(place),
+    ]),
+    panel('Conditions now', [
+      placeWeatherBlock(place),
+      el('p', { className: 'hint', text: 'The same provider adapter the trip Weather tab uses. It can be unavailable, and it is never replaced by a guess.' }),
     ]),
     panel('Save and plan', [
       el('div', { className: 'actions' }, [
@@ -472,11 +558,18 @@ function renderSaved() {
 
 function tripForm(trip) {
   const editing = Boolean(trip);
+  const destinationPlaces = [
+    { value: '', label: 'None (weather unavailable until a place is linked)' },
+    ...state.places.map((place) => ({ value: place.id, label: `${place.name} · ${place.locality}` })),
+  ];
   return el('form', { attrs: { id: 'trip-form', novalidate: 'novalidate' } }, [
     labelledField('Trip name', input('name', { value: trip ? trip.name : '', required: true }), null),
     errorFor('name'),
     labelledField('Destination', input('destination', { value: trip ? trip.destinationLabel : '', required: true })),
     errorFor('destination'),
+    labelledField('Reference place for map and weather (optional)',
+      select('destinationId', destinationPlaces, trip?.destinationId || ''),
+      'Used only for coordinates. Sample places have not been independently verified.'),
     labelledField('Start date', input('startDate', { type: 'date', value: trip ? trip.startDate : todayIsoDate(), required: true })),
     errorFor('startDate'),
     labelledField('End date', input('endDate', { type: 'date', value: trip ? trip.endDate : todayIsoDate(), required: true })),
@@ -724,7 +817,6 @@ function renderExpensesTab(trip) {
 }
 
 function weatherSummary(trip) {
-  const place = trip.destinationId ? getPlaceById(state.places, trip.destinationId) : null;
   const result = state.weather.tripId === trip.id ? state.weather.result : null;
 
   if (state.weather.tripId === trip.id && state.weather.loading) {
@@ -749,6 +841,36 @@ function weatherSummary(trip) {
       el('li', {}, [el('strong', { text: formatDate(day.date) }), el('span', { text: `${day.minTemperature}–${day.maxTemperature}°C · ${day.condition} · ${day.precipitation} mm` })]),
     )),
     result.note ? el('p', { className: 'notice', text: result.note }) : null,
+  ]);
+}
+
+/**
+ * Current conditions for a single place, through the weather adapter. The trip
+ * Weather tab owns day-by-day forecasts; this is the one-place view.
+ */
+function placeWeatherBlock(place) {
+  const active = state.placeWeather.placeId === place.id;
+  if (active && state.placeWeather.loading) {
+    return el('p', { text: 'Loading conditions…', attrs: { role: 'status' } });
+  }
+  const result = active ? state.placeWeather.result : null;
+  if (!result) {
+    return el('div', { className: 'actions' }, [button('Check conditions here', 'place-weather:load', '', { 'data-place-id': place.id })]);
+  }
+  if (result.status !== 'ok') {
+    return el('div', {}, [
+      el('p', { className: 'status status-unavailable', text: result.status === 'error' ? 'Weather request failed' : 'Conditions unavailable' }),
+      el('p', { text: result.message }),
+    ]);
+  }
+  return el('div', {}, [
+    el('p', { text: `Provider: ${result.provider} · retrieved ${result.retrievedAt}` }),
+    el('p', {
+      text: hasTemperature(result.current.temperature)
+        ? `Now: ${result.current.temperature}°C, ${result.current.condition}`
+        : `Now: ${result.current.condition}`,
+    }),
+    el('p', { className: 'hint', text: 'Current conditions only. Day-by-day forecasts for a trip live on that trip\u2019s Weather tab.' }),
   ]);
 }
 
@@ -803,6 +925,46 @@ function render() {
 
   view.textContent = '';
   for (const node of nodes.filter(Boolean)) view.append(node);
+
+  // Maps are mounted after the view is in the document, because Leaflet measures
+  // its container when it is created.
+  mountMaps();
+}
+
+/**
+ * Fills every map canvas in the current view. A canvas that cannot be drawn is
+ * replaced by the reason, so the page never shows an unexplained empty box.
+ */
+let mapViewVersion = 0;
+function mountMaps() {
+  const version = ++mapViewVersion;
+  releaseGoogleMaps();
+  releaseMountedMaps();
+  for (const container of view.querySelectorAll('[data-map-places]')) {
+    const ids = (container.dataset.mapPlaces || '').split(',').filter(Boolean);
+    const places = ids.map((id) => getPlaceById(state.places, id)).filter(Boolean);
+    const options = {
+      context: container.dataset.mapContext,
+      subject: container.dataset.mapSubject,
+    };
+    const fallbackToLeaflet = (reason = '') => {
+      if (version !== mapViewVersion || !container.isConnected) return;
+      const result = mountMap(container, places, options);
+      if (!result.ok) {
+        container.replaceWith(el('p', { className: 'notice', text: reason || result.reason }));
+      } else if (reason) {
+        const source = container.closest('.map-panel')?.querySelector('.map-source');
+        if (source) source.textContent = 'Google Maps unavailable; showing OpenStreetMap instead (© OpenStreetMap contributors).';
+      }
+    };
+    if (state.googleMapsKey) {
+      mountGoogleMap(container, places, state.googleMapsKey).then((result) => {
+        if (!result.ok) fallbackToLeaflet(result.reason);
+      }).catch(() => fallbackToLeaflet('Google Maps did not load.'));
+    } else {
+      fallbackToLeaflet();
+    }
+  }
 }
 
 /* ------------------------------------------------------------- actions ---- */
@@ -874,12 +1036,24 @@ async function demoLogin() {
 
 async function loadWeather(tripId) {
   const trip = tripsApi.getTripById(state.trips, tripId);
-  if (!trip) return;
+  if (!trip || trip.userId !== currentUserId()) return;
   state.weather = { tripId, loading: true, result: null };
   render();
-  const place = trip.destinationId ? getPlaceById(state.places, trip.destinationId) : null;
+  const linkedPlaceId = trip.destinationId ||
+    state.itinerary.find((item) => item.tripId === trip.id && item.placeId)?.placeId;
+  const place = linkedPlaceId ? getPlaceById(state.places, linkedPlaceId) : null;
   const result = await getWeatherForPlace(place, trip.startDate, trip.endDate);
   state.weather = { tripId, loading: false, result };
+  render();
+}
+
+async function loadPlaceWeather(placeId) {
+  const place = getPlaceById(state.places, placeId);
+  if (!place) return;
+  state.placeWeather = { placeId, loading: true, result: null };
+  render();
+  const result = await getWeatherForPlace(place, null, null);
+  state.placeWeather = { placeId, loading: false, result };
   render();
 }
 
@@ -900,12 +1074,12 @@ function handleClick(event) {
   else if (action === 'filter:clear') { state.filters = { query: '', category: 'All' }; render(); }
   else if (action === 'filter:category') { state.filters.category = target.dataset.category; state.section = 'discover'; render(); }
   else if (action === 'place:view') { state.activePlaceId = target.dataset.placeId; go('place'); }
-  else if (action === 'place:save') {
+  else if (action === 'place:save' && isMember()) {
     state.savedPlaces = savePlace(state.savedPlaces, currentUserId(), target.dataset.placeId);
     save(['savedPlaces']);
     setStatus('Place saved.');
     render();
-  } else if (action === 'place:unsave') {
+  } else if (action === 'place:unsave' && isMember()) {
     state.savedPlaces = removeSavedPlace(state.savedPlaces, currentUserId(), target.dataset.placeId);
     save(['savedPlaces']);
     setStatus('Place removed from saved places.');
@@ -913,7 +1087,14 @@ function handleClick(event) {
   } else if (action === 'trips:new') { state.editingTripId = 'new'; state.formErrors = {}; go('trips'); }
   else if (action === 'trips:cancel') { state.editingTripId = null; state.formErrors = {}; render(); }
   else if (action === 'trip:view') { state.activeTripId = target.dataset.tripId; state.tripTab = 'overview'; state.formErrors = {}; go('trip'); }
-  else if (action === 'trip:edit') { state.editingTripId = target.dataset.tripId; state.activeTripId = target.dataset.tripId; state.formErrors = {}; go('trips'); }
+  else if (action === 'trip:edit') {
+    const trip = tripsApi.getTripById(state.trips, target.dataset.tripId);
+    if (!trip || trip.userId !== currentUserId()) return;
+    state.editingTripId = trip.id;
+    state.activeTripId = trip.id;
+    state.formErrors = {};
+    go('trips');
+  }
   else if (action === 'trip:delete') {
     const trip = tripsApi.getTripById(state.trips, target.dataset.tripId);
     const owned = trip && trip.userId === currentUserId();
@@ -939,34 +1120,46 @@ function handleClick(event) {
     }
   } else if (action === 'tab:set') { state.tripTab = target.dataset.tab; state.formErrors = {}; render(); }
   else if (action === 'activity:delete') {
+    const trip = activeTrip();
+    if (!trip || !state.itinerary.some((item) => item.id === target.dataset.itemId && item.tripId === trip.id)) return;
     state.itinerary = itineraryApi.deleteActivity(state.itinerary, target.dataset.itemId);
     save(['itinerary']);
     setStatus('Activity removed. The linked place record is unchanged.');
     render();
   } else if (action === 'activity:move') {
+    if (!activeTrip()) return;
     state.itinerary = itineraryApi.moveActivity(state.itinerary, state.activeTripId, target.dataset.itemId, target.dataset.direction);
     save(['itinerary']);
     render();
   } else if (action === 'packing:delete') {
+    const trip = activeTrip();
+    if (!trip || !state.packing.some((item) => item.id === target.dataset.itemId && item.tripId === trip.id)) return;
     state.packing = packingApi.deletePackingItem(state.packing, target.dataset.itemId);
     save(['packing']);
     render();
   } else if (action === 'packing:suggest') {
+    if (!activeTrip()) return;
     state.packing = packingApi.suggestPackingItems(state.packing, state.activeTripId);
     save(['packing']);
     setStatus('Suggested items added. Existing items were not changed.');
     render();
   } else if (action === 'packing:toggle') {
+    const trip = activeTrip();
+    if (!trip || !state.packing.some((item) => item.id === target.dataset.itemId && item.tripId === trip.id)) return;
     state.packing = packingApi.togglePackingItem(state.packing, target.dataset.itemId);
     save(['packing']);
     render();
   } else if (action === 'expense:delete') {
+    const trip = activeTrip();
+    if (!trip || !state.expenses.some((item) => item.id === target.dataset.expenseId && item.tripId === trip.id)) return;
     state.expenses = expensesApi.deleteExpense(state.expenses, target.dataset.expenseId);
     save(['expenses']);
     setStatus('Expense removed. Totals recalculated.');
     render();
   } else if (action === 'weather:load') {
     loadWeather(target.dataset.tripId);
+  } else if (action === 'place-weather:load') {
+    loadPlaceWeather(target.dataset.placeId);
   } else if (action === 'reset:data') {
     if (window.confirm('Reset all local data back to the sample data? This cannot be undone.')) {
       storageApi.resetAllData();
@@ -1012,6 +1205,9 @@ function handleSubmit(event) {
   }
 
   if (form.id === 'trip-form') {
+    if (!userId) return;
+    // Refuse IDs that do not correspond to one of our known sample places.
+    data.destinationId = getPlaceById(state.places, data.destinationId) ? data.destinationId : '';
     const editing = state.editingTripId !== 'new'
       ? tripsApi.getTripById(state.trips, state.editingTripId)
       : null;
@@ -1024,6 +1220,10 @@ function handleSubmit(event) {
       state.editingTripId = null;
       state.activeTripId = editing.id;
       go('trip');
+      return;
+    }
+    if (state.editingTripId !== 'new') {
+      setStatus('You can only edit your own trips.');
       return;
     }
     const result = tripsApi.createTrip(data, userId);
@@ -1105,6 +1305,10 @@ function handleSubmit(event) {
 function init() {
   storageApi.ensureSeedData();
   loadData();
+  window.addEventListener('travelm:google-maps-error', () => {
+    state.googleMapsKey = null;
+    render(); // Revert to Leaflet without damaging saved trips.
+  });
   document.getElementById('app').addEventListener('click', handleClick);
   document.getElementById('app').addEventListener('submit', handleSubmit);
   // The demo account is created with a real salted+hashed password before first render.
@@ -1114,6 +1318,14 @@ function init() {
     render();
   });
   render();
+  // Optional gitignored key: until it is read, the existing Leaflet map works.
+  // Never write a demo API key into the repository or browser storage.
+  readLocalGoogleMapsKey().then((key) => {
+    if (key) {
+      state.googleMapsKey = key;
+      render();
+    }
+  });
 }
 
 init();

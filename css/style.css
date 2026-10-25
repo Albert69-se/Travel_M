@@ -370,12 +370,68 @@ button.primary {
   margin-top: 0.6rem;
 }
 
+/*
+ * Map. The placeholder below is the fallback only: it is shown when there is a
+ * reason no map can be drawn, and the reason is written into it.
+ */
 .map-placeholder {
   border: 1px dashed var(--line-strong);
   background: repeating-linear-gradient(45deg, #fafafa, #fafafa 8px, #f0f0f0 8px, #f0f0f0 16px);
   padding: 1rem;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.5rem;
   text-align: center;
+}
+
+.map-canvas {
+  height: 22rem;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  /* Leaflet sets its own font stack on this element; the page's font wins. */
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.map-source {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.map-panel .hint {
+  margin-top: 0.35rem;
+}
+
+/* Popups are built from DOM nodes, so only their presentation is set here. */
+.map-popup {
+  min-width: 9rem;
+}
+
+.map-popup strong {
+  display: block;
+}
+
+.map-popup p {
+  margin: 0.15rem 0;
+}
+
+.map-popup-coordinates {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.map-popup button {
+  margin-top: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font: inherit;
+}
+
+@media (max-width: 40rem) {
+  .map-canvas {
+    height: 16rem;
+  }
 }
 
 .tabs {

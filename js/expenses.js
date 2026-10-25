@@ -22,7 +22,11 @@ export function validateExpense(input) {
   const notes = isNonEmptyString(input.notes) ? input.notes.trim() : '';
 
   if (!description) errors.description = 'Enter a description.';
-  if (!isPositiveNumber(amount)) errors.amount = 'Enter an amount greater than zero.';
+  // Amounts smaller than one cent would otherwise be saved as zero after
+  // rounding, contradicting the requirement that each expense is positive.
+  if (!isPositiveNumber(amount) || !isPositiveNumber(roundMoney(amount))) {
+    errors.amount = 'Enter an amount of at least 0.01.';
+  }
   if (!EXPENSE_CATEGORIES.includes(category)) errors.category = 'Choose a category.';
   if (!isValidIsoDate(date)) errors.date = 'Enter a valid expense date.';
 

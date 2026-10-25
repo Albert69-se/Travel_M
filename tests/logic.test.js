@@ -21,12 +21,24 @@ import {
   roundMoney,
 } from '../js/utils.js';
 
-import { findPlaces, getPlaceById, getSavedPlaces, isPlaceSaved, removeSavedPlace, savePlace } from '../js/places.js';
+import { findPlaces, getPlaceById, getSavedPlaces, isPlaceSaved, isPlaceVerified, removeSavedPlace, savePlace } from '../js/places.js';
 import * as tripsApi from '../js/trips.js';
 import * as itineraryApi from '../js/itinerary.js';
 import * as packingApi from '../js/packing.js';
 import * as expensesApi from '../js/expenses.js';
 import * as authApi from '../js/auth.js';
+import * as storageApi from '../js/storage.js';
+import { googleMapsSearchUrl, googleMapsDirectionsUrl, readLocalGoogleMapsKey } from '../js/google-maps.js';
+import {
+  ACTIVE_MAP_MODE,
+  MAP_MODES,
+  boundsForPlaces,
+  describeAvailability,
+  describeProvider,
+  formatCoordinates,
+  getMappablePlaces,
+  isUsableCoordinate,
+} from '../js/map.js';
 
 const TRIP = {
   id: 'trip-1',
@@ -72,6 +84,83 @@ test('date helpers reject malformed values and enforce the inclusive range', () 
     '2026-11-14',
     '2026-11-15',
   ]);
+});
+
+test('calendar validation rejects rolled-over dates but accepts leap days', () => {
+  assert.equal(isValidIsoDate('2026-02-30'), false);
+  assert.equal(isValidIsoDate('2026-02-29'), false);
+  assert.equal(isValidIsoDate('2024-02-29'), true);
+  assert.equal(isValidIsoDate('2026-04-31'), false);
+  assert.equal(isValidIsoDate('2026-13-01'), false);
+  assert.equal(isValidIsoDate('0000-01-01'), false);
+  assert.equal(isValidIsoDate('0099-12-31'), true);
+  assert.deepEqual(listDatesInRange('2026-02-30', '2026-03-02'), []);
+});
+
+test('a reference place is saved on newly created and edited trips', () => {
+  const input = { name: 'Temple trip', destination: 'Chiang Mai',
+    startDate: '2026-11-12', endDate: '2026-11-15', budget: '100',
+    destinationId: 'place-doi-suthep' };
+  const created = tripsApi.createTrip(input, 'user-demo');
+  assert.equal(created.trip.destinationId, 'place-doi-suthep');
+  const edited = tripsApi.updateTrip([created.trip], created.trip.id,
+    { ...input, destinationId: 'place-old-city-gate' }, 'user-demo');
+  assert.equal(edited.trips[0].destinationId, 'place-old-city-gate');
+});
+
+test('Google Maps URLs are keyless and encode coordinates for viewing or directions', () => {
+  const place = { name: 'Doi Suthep', latitude: 18.8049, longitude: 98.9216 };
+  const search = new URL(googleMapsSearchUrl(place));
+  const directions = new URL(googleMapsDirectionsUrl(place));
+  assert.equal(search.host, 'www.google.com');
+  assert.equal(search.searchParams.get('api'), '1');
+  assert.equal(search.searchParams.get('query'), '18.8049,98.9216');
+  assert.equal(directions.searchParams.get('destination'), '18.8049,98.9216');
+  assert.equal(search.searchParams.has('key'), false);
+  assert.equal(directions.searchParams.has('key'), false);
+});
+
+test('Google Maps configuration is optional and ignored if missing or invalid', async () => {
+  assert.equal(await readLocalGoogleMapsKey(async () => ({ ok: false })), null);
+  assert.equal(await readLocalGoogleMapsKey(async () => ({ ok: true, json: async () => ({ apiKey: '' }) })), null);
+  assert.equal(await readLocalGoogleMapsKey(async () => ({ ok: true, json: async () => ({ apiKey: 'demo-key' }) })), 'demo-key');
+});
+
+test('a reviewed place is not mislabeled as independently verified', () => {
+  const sample = { sourceReference: 'Sample park listing — not verified',
+    lastCheckedAt: '2026-09-01', contentStatus: 'reviewed' };
+  assert.equal(isPlaceVerified(sample), false);
+  assert.equal(isPlaceVerified({ ...sample, contentStatus: 'approved' }), false);
+  assert.equal(isPlaceVerified({ ...sample, contentStatus: 'approved', sourceReference: 'https://example.org/official-park' }), true);
+  assert.equal(isPlaceVerified({ ...sample, contentStatus: 'approved', sourceReference: 'https://example.org/official-park', lastCheckedAt: null }), false);
+});
+
+test('expenses that round to zero are rejected instead of silently saved', () => {
+  const result = expensesApi.validateExpense({
+    description: 'Fractional cent', amount: '0.001', category: 'Food',
+    date: '2026-11-13',
+  });
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.amount);
+});
+
+test('storage operations report quota failures instead of silently claiming success', () => {
+  const original = globalThis.localStorage;
+  const previousWarning = console.warn;
+  try {
+    globalThis.localStorage = {
+      setItem() { throw new Error('QuotaExceededError'); },
+    };
+    console.warn = () => {};
+    assert.equal(storageApi.writeJson('test', { tripId: 'trip-1' }), false);
+    assert.equal(storageApi.writeList('test', []), false);
+    globalThis.localStorage = { setItem() {} };
+    assert.equal(storageApi.writeJson('test', {}), true);
+  } finally {
+    console.warn = previousWarning;
+    if (original === undefined) delete globalThis.localStorage;
+    else globalThis.localStorage = original;
+  }
 });
 
 test('numeric guards distinguish positive, non-negative, and invalid input', () => {
@@ -530,4 +619,106 @@ test('one traveller cannot modify or delete another traveller\'s trip', () => {
 
   // A missing trip is reported as missing, not as a permission failure.
   assert.equal(tripsApi.removeTripAndDependents('nope', withDependents, 'user-a').ok, false);
+});
+
+/* ------------------------------------------------------------------- map --- */
+
+const MAPPABLE = [
+  { id: 'm1', name: 'Mappable one', latitude: 18.8049, longitude: 98.9216 },
+  { id: 'm2', name: 'Mappable two', latitude: 18.7883, longitude: 98.9936 },
+];
+
+test('map coordinates are only accepted when they are real positions on the globe', () => {
+  assert.equal(isUsableCoordinate(18.8049, 98.9216), true);
+  assert.equal(isUsableCoordinate(0, 0), true);
+  assert.equal(isUsableCoordinate(-90, -180), true);
+
+  // Out of range on either axis.
+  assert.equal(isUsableCoordinate(90.01, 0), false);
+  assert.equal(isUsableCoordinate(-90.01, 0), false);
+  assert.equal(isUsableCoordinate(0, 180.01), false);
+
+  // Missing, wrong type, or not a number.
+  assert.equal(isUsableCoordinate(undefined, 98.9216), false);
+  assert.equal(isUsableCoordinate(null, null), false);
+  assert.equal(isUsableCoordinate('18.8049', '98.9216'), false);
+  assert.equal(isUsableCoordinate(Number.NaN, 98.9216), false);
+  assert.equal(isUsableCoordinate(Number.POSITIVE_INFINITY, 0), false);
+});
+
+test('places without usable coordinates are dropped rather than mapped at zero,zero', () => {
+  const places = [
+    ...MAPPABLE,
+    { id: 'no-coords', name: 'No coordinates' },
+    { id: 'null-coords', name: 'Null coordinates', latitude: null, longitude: null },
+    { id: 'broken', name: 'Broken coordinates', latitude: 999, longitude: 'east' },
+  ];
+
+  assert.deepEqual(getMappablePlaces(places).map((place) => place.id), ['m1', 'm2']);
+  // A malformed dataset is reported as empty, not as an error.
+  assert.deepEqual(getMappablePlaces(null), []);
+  assert.deepEqual(getMappablePlaces('not a list'), []);
+});
+
+test('the four reasons a map is not drawn are kept distinct', () => {
+  const off = describeAvailability({ mode: MAP_MODES.NONE, leafletAvailable: true, places: MAPPABLE });
+  assert.equal(off.available, false);
+  assert.match(off.reason, /switched off/i);
+
+  const noLibrary = describeAvailability({ mode: MAP_MODES.LEAFLET_OSM, leafletAvailable: false, places: MAPPABLE });
+  assert.equal(noLibrary.available, false);
+  assert.match(noLibrary.reason, /library did not load/i);
+
+  const nothing = describeAvailability({ mode: MAP_MODES.LEAFLET_OSM, leafletAvailable: true, places: [], subject: 'search result' });
+  assert.equal(nothing.available, false);
+  assert.match(nothing.reason, /no search result to show/i);
+
+  const noCoordinates = describeAvailability({
+    mode: MAP_MODES.LEAFLET_OSM,
+    leafletAvailable: true,
+    places: [{ id: 'x', name: 'No coordinates' }],
+    subject: 'place',
+  });
+  assert.equal(noCoordinates.available, false);
+  assert.match(noCoordinates.reason, /no place here has usable coordinates/i);
+
+  const ready = describeAvailability({ mode: MAP_MODES.LEAFLET_OSM, leafletAvailable: true, places: MAPPABLE });
+  assert.equal(ready.available, true);
+  assert.equal(ready.reason, '');
+});
+
+test('the map is drawn with OpenStreetMap tiles and needs no credentials', () => {
+  assert.equal(ACTIVE_MAP_MODE, MAP_MODES.LEAFLET_OSM);
+  const provider = describeProvider();
+  assert.match(provider.provider, /Leaflet/);
+  assert.match(provider.provider, /OpenStreetMap/);
+  assert.match(provider.licence, /No API key/);
+  assert.match(provider.tiles, /OpenStreetMap/);
+
+  const off = describeProvider(MAP_MODES.NONE);
+  assert.equal(off.provider, 'Not connected');
+  assert.match(off.licence, /No map provider/);
+});
+
+test('the map bounds cover every mappable place, and null when none can be mapped', () => {
+  assert.deepEqual(boundsForPlaces(MAPPABLE), {
+    minLatitude: 18.7883,
+    maxLatitude: 18.8049,
+    minLongitude: 98.9216,
+    maxLongitude: 98.9936,
+  });
+
+  const single = boundsForPlaces([MAPPABLE[0]]);
+  assert.equal(single.minLatitude, single.maxLatitude);
+  assert.equal(single.minLongitude, single.maxLongitude);
+
+  assert.equal(boundsForPlaces([{ id: 'x', name: 'No coordinates' }]), null);
+  assert.equal(boundsForPlaces([]), null);
+});
+
+test('coordinates are written with hemisphere letters and four decimals', () => {
+  assert.equal(formatCoordinates(18.8049, 98.9216), '18.8049° N, 98.9216° E');
+  assert.equal(formatCoordinates(-33.8688, 151.2093), '33.8688° S, 151.2093° E');
+  assert.equal(formatCoordinates(40.7128, -74.006), '40.7128° N, 74.0060° W');
+  assert.equal(formatCoordinates(null, 10), 'Coordinates not recorded');
 });

@@ -7,6 +7,8 @@ venv/
 .env
 .env.*
 !.env.example
+# A browser Maps key is public to the browser, but should not be committed.
+js/maps-config.local.json
 
 # generated output
 dist/

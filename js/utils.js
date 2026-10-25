@@ -27,7 +27,14 @@ export function isNonNegativeNumber(value) {
 export function isValidIsoDate(value) {
   if (!isNonEmptyString(value)) return false;
   const trimmed = value.trim();
-  return ISO_DATE_PATTERN.test(trimmed) && !Number.isNaN(Date.parse(trimmed));
+  if (!ISO_DATE_PATTERN.test(trimmed)) return false;
+  const [year, month, day] = trimmed.split('-').map(Number);
+  if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31) return false;
+  // Date.parse silently rolls over 2026-02-30 to March. Round-trip the UTC
+  // calendar fields instead; setUTCFullYear handles years 0001–0099 correctly.
+  const parsed = new Date(0);
+  parsed.setUTCFullYear(year, month - 1, day);
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === day;
 }
 
 /** Rounds to cents so repeated add/subtract does not drift (BR-15). */

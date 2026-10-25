@@ -49,15 +49,17 @@ export function readList(key) {
 }
 
 export function writeList(key, list) {
-  writeJson(key, Array.isArray(list) ? list : []);
+  return writeJson(key, Array.isArray(list) ? list : []);
 }
 
 export function writeJson(key, value) {
-  if (!storageAvailable()) return;
+  if (!storageAvailable()) return false;
   try {
     localStorage.setItem(key, JSON.stringify(value));
+    return true;
   } catch (error) {
     console.warn(`Could not save "${key}": ${error.message}`);
+    return false;
   }
 }
 

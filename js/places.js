@@ -68,3 +68,13 @@ export function describeProvenance(place) {
   const status = isNonEmptyString(place.contentStatus) ? place.contentStatus.replace('_', ' ') : 'status unknown';
   return { source, checked, status };
 }
+
+/** Only content explicitly approved after a dated source check is verified.
+ * 'reviewed' is an editorial state, not proof that a tourism claim is current.
+ */
+export function isPlaceVerified(place) {
+  if (!place || place.contentStatus !== 'approved') return false;
+  if (!isNonEmptyString(place.sourceReference) || /^(not supplied|sample|unknown)/i.test(place.sourceReference.trim())) return false;
+  if (typeof place.lastCheckedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(place.lastCheckedAt)) return false;
+  return true;
+}

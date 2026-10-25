@@ -5,8 +5,9 @@ A small travel-planning web application for the Software Engineering course proj
 laid out from the low-fidelity wireframes in the Figma file
 `tpG5r8u58db4RveTTINIku` ("Travel M — Responsive Low-Fidelity Wireframes").
 
-Plain HTML, CSS, and JavaScript ES modules. There is no framework, no build step, and
-no backend.
+Plain HTML, CSS, and JavaScript ES modules. There is no framework, no build step,
+and no backend. Leaflet is loaded from a version- and integrity-pinned CDN URL.
+Google Maps is an optional second map provider for the course demo.
 
 ## Running it locally
 
@@ -38,6 +39,7 @@ empty planner of your own.
 | Trip Packing List | — | add, tick off, remove items; packed/total counts |
 | Trip Expenses | — | record expenses, totals, remaining budget, warnings |
 | Trip Weather | — | loads through a provider adapter, or explains it is unavailable |
+| Places map | drawn for the search results, and for a single place on its details page — or the reason it is missing | same |
 
 ## Accounts and sign-in
 
@@ -67,7 +69,11 @@ Demo credentials, published in the interface on purpose: `demo@travelm.local` /
 ## Weather
 
 Weather is **on by default** and needs no API key — the provider is Open-Meteo, and the
-sample trip's place (Doi Suthep) carries real coordinates. The provider sits behind a
+sample trip's place (Doi Suthep) carries sample coordinates. New trips can optionally
+select a reference place from the local catalog; a trip with no reference place can use
+the first place linked to its itinerary. If no place with coordinates is available, the
+weather feature reports that it is unavailable instead of inventing a location.
+The provider sits behind a
 small adapter in `js/weather.js` so it can be swapped without touching anything else.
 
 The three outcomes are handled distinctly, and a failure never affects stored trip data:
@@ -84,6 +90,78 @@ One honest detail worth knowing before you demo it: Open-Meteo forecasts roughly
 further away than that, the screen shows current conditions for the destination plus an
 explicit note that no forecast covers those dates. It never displays a guess.
 
+The same adapter also supplies **current conditions for a single place**, on that place's
+details page, beside its map pin. Day-by-day forecasts stay on the trip's Weather tab.
+
+## Maps — Google demo key or keyless OpenStreetMap
+
+**Google Maps is configured for the local Mac prototype** through a file excluded
+from Git: `js/maps-config.local.json`. In another checkout, create that file with:
+
+```json
+{ "apiKey": "YOUR_GOOGLE_MAPS_DEMO_KEY" }
+```
+
+When this file exists and contains a key, Travel-M loads the **Google Maps
+JavaScript API** on Discover and place-detail maps. It uses only map rendering
+and markers; it does not call the paid Places/Routes services in the background.
+If the map script fails to load or the key is rejected, the app attempts
+**Leaflet + OpenStreetMap** instead. Without the local configuration file,
+Leaflet is the default.
+
+**Security:** This config is gitignored to prevent accidentally publishing your
+key in source control, but a browser map key is **not secret**: anyone who visits
+the hosted site can see it in the request. Restrict the key to the Maps JavaScript
+API and the approved HTTP referrers in Google Cloud, including the exact host
+used for your local demo. Rotate any publicly shared key before deployment.
+Google's Maps Demo Key is for **prototyping, not public production**, and has
+daily usage limits. Never place a server API key in this client-side file.
+
+**View on Google Maps** and **Get directions** links on the place-detail page
+use Google's official Maps URLs, which require no API key. Link destinations
+are based on Travel-M sample coordinates until the place has been verified.
+
+The backup map needs no key: **Leaflet** renders **OpenStreetMap** tiles.
+Leaflet is loaded from a pinned CDN URL in `index.html`,
+and the interface checks that it arrived before drawing anything.
+
+The map appears in two places, both through the same adapter in `js/map.js`:
+
+- **Discover** — one marker per search result, so a change of filter is visible on the map.
+  Clicking a marker opens a popup with the place's coordinates and a control that opens its
+  details.
+- **Place details** — the place on its own.
+
+Markers are drawn as circles rather than image pins, so there are no icon assets that can go
+missing, and popups are built from DOM nodes with `textContent`, never from an HTML string.
+
+Three situations are handled distinctly, and none of them is shown as an empty grey box:
+
+- **the provider is switched off** — `ACTIVE_MAP_MODE = MAP_MODES.NONE`, the offline demo
+  state, alongside `WEATHER_MODES.NONE`
+- **Leaflet did not load**, for example when the page is offline — said plainly, and the
+  places are still listed with their recorded coordinates
+- **a record has no usable coordinates** — including a record whose latitude or longitude
+  is present but out of range, which is left off the map rather than pinned at 0,0
+
+Two limits worth knowing before a demo: the tiles come from the OpenStreetMap Foundation's
+public tile servers, which expect light use and are not a free CDN for a product; and the
+pin positions come from this prototype's sample coordinates, so nothing has been
+field-verified. Both are stated in the interface as well as here.
+
+## Data sources and licences
+
+| Source | Used for | Licence and terms |
+|---|---|---|
+| [Leaflet](https://leafletjs.com/) 1.9.4 | map rendering | BSD-2-Clause |
+| [OpenStreetMap](https://www.openstreetmap.org/copyright) standard tiles | map imagery | © OpenStreetMap contributors, ODbL, subject to the tile usage policy |
+| [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript) (optional demo key) | map rendering and markers | Google Maps Platform Terms; demo keys for prototyping only |
+| [Open-Meteo](https://open-meteo.com/) | current conditions and forecast | CC BY 4.0, free for non-commercial use, no key |
+
+Map and weather provider credits appear in the interface: OpenStreetMap attribution
+on Leaflet, Google's own map attribution on Google Maps, and the provider line
+above each forecast.
+
 ## Places and provenance
 
 Place records carry `sourceReference`, `lastCheckedAt`, and `contentStatus`. Every
@@ -92,14 +170,16 @@ says *"Not supplied"*, *"Not verified"* or *"Estimate only"* rather than present
 guess as a fact. This follows FR-3.5/3.6 and NFR-9, which require sourced information
 and an explicit last-checked date.
 
-There is **no map integration yet**: the interface shows a labelled map placeholder.
-The map provider is the one dependency that requires credentials.
+Every place carries `latitude` and `longitude`, so any place can be drawn on a map. The
+provider, and what it does when it cannot draw one, is described under **Maps** above.
 
 ## Data storage
 
 Everything is stored in the browser's `localStorage` under a few named keys
 (`travelm.users`, `travelm.session`, `travelm.trips`, `travelm.expenses`, and so on).
-Nothing is sent anywhere. Data survives a page refresh in the same browser, and the
+Trip/account records are stored only in the browser; external map tile and weather
+requests go to their respective providers, and using the optional Google provider
+sends the browser key and map requests to Google. Data survives a page refresh in the same browser, and the
 footer has a **Reset sample data** button.
 
 Sample data is seeded on first run: eight places, one trip (Chiang Mai, 12–15 Nov,
@@ -115,17 +195,19 @@ node --test
 Uses Node's built-in test runner, so there is no testing dependency. The tests cover
 trip validation, invalid date ranges, unique id generation, itinerary add/remove/reorder,
 packing updates and trip isolation, expense validation, total and remaining-budget
-calculations, the 80% nearing-budget threshold, place filtering, empty datasets,
-registration validation, password hashing and verification, session resolution, and
-cross-user access refusal.
+calculations, the 80% nearing-budget threshold, place filtering, empty datasets, map
+coordinate validation, the four distinct reasons a map is not drawn, map bounds, coordinate
+formatting, registration validation, password hashing and verification, session resolution,
+and cross-user access refusal.
 
-Core logic is kept independent of the DOM so it can be tested directly.
+Core logic is kept independent of the DOM, including the map adapter's decision logic, so
+it can be tested directly.
 
 ## Project structure
 
 ```
 travel-m/
-├── index.html            entry point and page structure
+├── index.html            entry point, page structure, and the Leaflet CDN link
 ├── css/style.css         all styling and responsive rules
 ├── js/
 │   ├── app.js            initialisation, session handling, navigation, rendering
@@ -133,11 +215,13 @@ travel-m/
 │   ├── storage.js        all localStorage reads and writes
 │   ├── data.js           sample places, categories, and seed records
 │   ├── places.js         search, filtering, saved-place links, provenance wording
+│   ├── map.js            map provider adapter: Leaflet, OpenStreetMap tiles, fallbacks
+│   ├── google-maps.js     optional Google Maps demo provider and keyless Maps URLs
 │   ├── trips.js          trip validation, create/edit/delete, cascade delete
 │   ├── itinerary.js      activities by trip day, ordering, validation
 │   ├── packing.js        per-trip checklist and counts
 │   ├── expenses.js       expenses, totals, remaining budget, budget status
-│   ├── weather.js        optional weather provider adapter
+│   ├── weather.js        weather provider adapter: Open-Meteo
 │   └── utils.js          validation, id generation, date and money helpers
 ├── tests/logic.test.js   tests for the core logic
 └── README.md
@@ -158,7 +242,11 @@ These are deliberate and should be stated rather than hidden:
    hash.
 2. **No real user accounts beyond this prototype's local records.** Signing in on another
    device will not find them.
-3. **No map.** A placeholder is shown where the map belongs.
+3. **Map tiles need the network.** Leaflet and OpenStreetMap need no credentials, but
+   tiles are fetched from OpenStreetMap's public servers as the map is viewed. Offline,
+   the map is replaced by a labelled explanation. Those servers are not intended for heavy
+   or commercial traffic, so a production build would need its own tile source or a paid
+   provider.
 4. **Place records are samples.** They are not verified facts and must not be presented
    as such.
 

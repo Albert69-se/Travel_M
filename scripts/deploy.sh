@@ -62,6 +62,7 @@ ssh "$VPS" "mkdir -p '$APP_DIR/server' '$APP_DIR/dist'"
 # replacement until each transfer is complete. Rollback snapshots remain above.
 rsync -az --delay-updates dist/ "$VPS:$APP_DIR/dist/"
 rsync -az server/static-server.js "$VPS:$APP_DIR/server/static-server.js"
+rsync -az server/static-server.test.mjs "$VPS:$APP_DIR/server/static-server.test.mjs"
 rsync -az server/travel-m-react.service "$VPS:$APP_DIR/server/travel-m-react.service"
 
 echo "== service =="

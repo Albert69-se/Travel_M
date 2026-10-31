@@ -59,7 +59,7 @@ Baseline committed before any redesign edits. Preview available at http://127.0.
 ### Rollback
 The pre-overhaul checkpoint is `45e9d61`. The implementation is committed separately with subject
 `feat: overhaul TravelM workspace and planning UX`. Revert that implementation commit to restore
-the checkpoint while keeping Git history. No production deployment or remote push was made.
+the checkpoint while keeping Git history. The UI commit was made locally first; VPS deployment followed on user request below. No remote Git push was made.
 
 ## VPS deployment follow-up
 User requested deployment after the UI commit. Verified `edux-oracle-vps` resolves to the existing Tailscale host and `travel-m-react.service` serves `/home/opc/apps/travel-m-react/dist` on port 8802; the tunnel is active.
@@ -67,3 +67,18 @@ User requested deployment after the UI commit. Verified `edux-oracle-vps` resolv
 Preflight found the server sends `X-Frame-Options: DENY` for the catalog, blocking the existing embedded architecture. Added a SAMEORIGIN exception for only `catalog/index.html`; other routes remain DENY. Regression coverage checks normal/cached catalog responses and executable module MIME. Updated the obsolete smoke assertion that still required Leaflet.
 
 Keep the existing hosted school-evaluation deployment mode; do not change map keys or billing. Snapshot assets/server, deploy the committed build, restart only TravelM, verify artifact hashes, local and public routes, catalog framing and module responses. Browser interaction remains unavailable in Work settings.
+
+### Deployed and verified, 31 October 2026
+- App code: `abc5e29`; VPS compatibility fix: `153a416`.
+- Live evaluation URL: https://travel-m.xcalibur.space
+- Rollback assets: `/home/opc/apps/travel-m-react/dist.rollback-20261031-171355`.
+- Rollback server: `/home/opc/apps/travel-m-react/server/static-server.js.rollback-20261031-171355`.
+- Existing deployment script created both backups before transfer; only the app service was restarted. App and tunnel are active.
+- `rsync -azcni` found no differences between local build files and the uploaded release. Server SHA-256 also matches.
+- Public HTTP smoke: 25 passed, 0 failed. Local production-server regression suite: 8 passed, including catalog framing and module MIME.
+- Public HTML, catalog HTML/JS/CSS/navigation module, and fingerprinted app JS/CSS match the local build. HTML comparison excludes only the observed Cloudflare challenge-platform injection; public code assets match byte for byte.
+- Root remains `X-Frame-Options: DENY`; catalog is `SAMEORIGIN`; non-HTML modules retain the JavaScript MIME type.
+- Public browser interaction and rendered screenshots were not tested because local browser use is disabled in Work settings.
+
+To revert the UI in source, revert `abc5e29` (retain `153a416` if keeping the catalog iframe architecture).
+To restore the exact pre-deployment VPS release, restore both timestamped asset and server backups above and restart `travel-m-react.service`. Preserve the current release as another snapshot first.

@@ -14,23 +14,7 @@ import { Badge, Button, Card, CardHeader, FinePrint, Notice } from '../component
 import { useData } from '../lib/store.jsx';
 import { dateRange, shortDate, weekdayDate } from '../lib/format.js';
 import { getWeatherForPlace, hasTemperature } from '../../core/weather.js';
-
-/** The text a place can be recognised by when matching a destination label. */
-function labelsOf(place) {
-  return [place.name, place.locality]
-    .filter((value) => typeof value === 'string' && value.trim() !== '')
-    .map((value) => value.trim().toLowerCase());
-}
-
-function findPlaceForLabel(places, label) {
-  if (typeof label !== 'string' || label.trim() === '') return null;
-  const needle = label.trim().toLowerCase();
-  return (
-    places.find((place) => labelsOf(place).includes(needle)) ||
-    places.find((place) => labelsOf(place).some((value) => value.includes(needle) || needle.includes(value))) ||
-    null
-  );
-}
+import { resolveWeatherPlace } from '../../core/weather-place.js';
 
 function temperatureLabel(value) {
   return hasTemperature(value) ? `${Math.round(value)} °C` : 'Not reported';
@@ -70,23 +54,8 @@ export default function WeatherView() {
   const [response, setResponse] = useState({ requestKey: '', value: null });
   const [reloadToken, setReloadToken] = useState(0);
 
-  // A forecast needs coordinates, so the destination is resolved to a place
-  // record: the linked place first, then a label match, then the first
-  // itinerary activity that names a place.
-  const place = useMemo(() => {
-    const byId = trip.destinationId
-      ? places.find((entry) => entry.id === trip.destinationId) || null
-      : null;
-    if (byId) return byId;
-
-    const byLabel = findPlaceForLabel(places, trip.destinationLabel);
-    if (byLabel) return byLabel;
-
-    const activity = activities.find((item) => item.placeId);
-    if (activity) return places.find((entry) => entry.id === activity.placeId) || null;
-
-    return null;
-  }, [places, trip.destinationId, trip.destinationLabel, activities]);
+  const place = useMemo(() => resolveWeatherPlace(places, trip, activities),
+    [places, trip, activities]);
 
   const placeId = place ? place.id : 'none';
   // The loading state is derived from the request identity, so no state is set
@@ -168,8 +137,8 @@ export default function WeatherView() {
           <>
             <Card className="flex flex-col gap-3">
               <CardHeader
-                title={current.condition || 'Conditions not reported'}
-                meta={`Retrieved ${retrievedLabel(result.retrievedAt)} · valid for ${result.validFor}`}
+                title="Current conditions"
+                meta={`Retrieved ${retrievedLabel(result.retrievedAt)} · weather now, not a forecast for your trip dates`}
                 action={<Badge tone="neutral">{result.provider}</Badge>}
               />
 

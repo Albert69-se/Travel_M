@@ -48,6 +48,16 @@ export function DataProvider({ children }) {
 
   const refresh = useCallback(() => setData(readSnapshot()), []);
 
+  // The Discover catalog shares this origin in its own browsing context.
+  // Keep shell, saved places and trip state current after its storage writes.
+  useEffect(() => {
+    const handleStorage = event => {
+      if (event.storageArea === localStorage && event.key?.startsWith('travelm.')) refresh();
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [refresh]);
+
   const setStatus = useCallback((message, tone = 'info') => {
     setStatusState(message ? { message, tone } : null);
   }, []);

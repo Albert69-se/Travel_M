@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script>
+    if (new URLSearchParams(location.search).get('embedded') === '1' && window.parent !== window) {
+      document.documentElement.classList.add('embedded');
+    } else {
+      const params = new URLSearchParams(location.search);
+      params.delete('embedded');
+      location.replace('/discover' + (params.size ? '?' + params : ''));
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse 200 OpenStreetMap-sourced destinations across Chiang Mai and Chiang Rai with source transparency.">
+  <meta name="theme-color" content="#f7f8f7">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/catalog/catalog.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Curated attractions | TravelM</title>
+  <script type="module" src="/catalog/catalog-app.mjs"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="TravelM home"><span class="brand-mark">M</span> Travel<span class="brand-accent">M</span></a>
+    <nav aria-label="Main navigation">
+      <a class="nav-active" href="/catalog/index.html">Discover</a>
+      <a href="/saved">Saved places</a>
+      <a href="/trips">My trips</a>
+      <a href="/">Home</a>
+    </nav>
+  </header>
+  <main class="shell">
+    <div class="intro">
+      <div>
+        <p class="eyebrow">EXPLORE NORTHERN THAILAND</p>
+        <h1>Discover places</h1>
+        <p class="subtitle">Temples in the hills, quiet waterfalls and local markets. Find your kind of adventure in Chiang Mai and Chiang Rai.</p>
+      </div>
+      <div class="catalog-counter" aria-label="Catalog size"><strong>200</strong><span>attractions</span><small>100 in each province</small></div>
+    </div>
+    <div class="disclosure" role="note">
+      <span aria-hidden="true">ⓘ</span>
+      <span>Locations are from OpenStreetMap, extracted on <strong>16 Oct 2026</strong>. These are short-listed map records, <strong>not independently verified</strong>. Confirm access, opening hours and fees before visiting.</span>
+    </div>
+    <section class="toolbar" aria-label="Search and filters">
+      <label class="search"><span>Search places</span><input id="query" type="search" placeholder="Search temples, waterfalls, museums…" autocomplete="off"></label>
+      <label><span>Province</span><select id="province"><option value="All">Both provinces</option><option value="Chiang Mai Province">Chiang Mai</option><option value="Chiang Rai Province">Chiang Rai</option></select></label>
+      <label><span>Category</span><select id="category"><option value="All">All categories</option><option value="Culture">Culture</option><option value="Nature">Nature</option><option value="Food">Food & markets</option></select></label>
+      <div class="view-switch" role="group" aria-label="Display mode"><button id="list-mode" type="button" class="active" aria-pressed="true">Browse</button><button id="map-mode" type="button" aria-pressed="false">Map</button></div>
+    </section>
+    <button id="clear-filters" class="reset-filters" type="button" hidden>Clear filters</button>
+    <div id="status" class="status" role="status" aria-live="polite">Loading local catalog…</div>
+    <div class="content-layout">
+      <section class="listing" aria-label="Matching attractions">
+        <div class="section-heading"><strong id="result-count">Attractions</strong><span id="category-hint">All places</span></div>
+        <div id="items" class="places" aria-live="off"></div>
+        <button id="show-more" type="button" class="show-more" hidden>Show more places</button>
+        <p id="empty" class="empty" hidden>No attractions match. Try different keywords or filters.</p>
+      </section>
+      <aside class="detail-column" aria-label="Attraction details" hidden>
+        <button id="back-results" class="btn back-results" type="button">← Back to browsing</button>
+        <div id="map-wrapper" hidden><div class="map-types" role="group" aria-label="Map style"><button id="roadmap-type" type="button" aria-pressed="true">Map</button><button id="satellite-type" type="button" aria-pressed="false">Satellite</button></div><div id="map" role="region" aria-label="Google map of attractions"></div><p id="map-caption" class="map-caption">Select a marker for details.</p></div>
+        <div id="details" class="details">
+          <div class="detail-placeholder"><span class="placeholder-icon" aria-hidden="true">⌖</span><h2>Select an attraction</h2><p>Open any place to see its map location, data source, and trip-planning actions.</p></div>
+        </div>
+      </aside>
+    </div>
+    <div id="notice" class="toast" role="status" aria-live="polite" hidden></div>
+  </main>
+  <footer class="footer">
+    <span>© OpenStreetMap contributors · ODbL. Attribution and source links provided for each destination.</span>
+    <span>Priority references: <a href="https://www.tourismthailand.org/Destinations/Provinces/Chiang-Mai/101" target="_blank" rel="noopener noreferrer">TAT Chiang Mai</a> · <a href="https://www.tourismthailand.org/Destinations/Provinces/Chiang-Rai/102" target="_blank" rel="noopener noreferrer">TAT Chiang Rai</a></span>
+  </footer>
+</body>
+</html>

@@ -78,7 +78,7 @@ async function fetchOpenMeteo(latitude, longitude, startDate, endDate) {
   url.searchParams.set('timezone', 'auto');
   url.searchParams.set('forecast_days', String(FORECAST_DAYS));
 
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(12000) });
   if (!response.ok) {
     throw new Error(`provider returned HTTP ${response.status}`);
   }
@@ -115,7 +115,8 @@ export async function getWeatherForPlace(place, startDate, endDate, mode = ACTIV
     return unavailable('Weather provider is not connected. No conditions or temperature are shown.');
   }
 
-  if (!place || !isFiniteNumber(place.latitude) || !isFiniteNumber(place.longitude)) {
+  if (!place || !isFiniteNumber(place.latitude) || !isFiniteNumber(place.longitude) ||
+      Math.abs(place.latitude) > 90 || Math.abs(place.longitude) > 180) {
     return unavailable('This place has no usable coordinates, so no forecast can be requested.');
   }
 
@@ -123,7 +124,10 @@ export async function getWeatherForPlace(place, startDate, endDate, mode = ACTIV
     return await fetchOpenMeteo(place.latitude, place.longitude, startDate, endDate);
   } catch (error) {
     // A provider failure must never break the rest of the application.
-    return { status: 'error', provider: 'Open-Meteo', message: `Weather request failed: ${error.message}` };
+    return { status: 'error', provider: 'Open-Meteo', message:
+      error.name === 'TimeoutError' || error.name === 'AbortError'
+        ? 'The weather provider took too long to respond. Please retry.'
+        : `Weather request failed: ${error.message}` };
   }
 }
 

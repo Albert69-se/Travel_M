@@ -86,7 +86,7 @@ function Brand({ compact = false }) {
       </span>
       {compact ? null : (
         <span className="min-w-0">
-          <span className="block truncate text-card-title font-semibold text-ink">Travel M</span>
+          <span className="tm-wordmark">Travel<span>M</span></span>
           <span className="block truncate text-micro uppercase text-ink-tertiary">Trip planner</span>
         </span>
       )}

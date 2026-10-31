@@ -1,3 +1,4 @@
+import { filtersFromSearch } from './catalog-navigation.mjs';
 import { observePhotos } from './catalog-photos.mjs';
 import {
   validateCatalog, searchCatalog, toggleSave, isSaved,
@@ -5,7 +6,7 @@ import {
 } from './catalog-core.mjs';
 
 const $ = id => document.getElementById(id);
-const state = { places: [], query: '', province: 'All', category: 'All',
+const state = { places: [], ...filtersFromSearch(location.search),
   visible: 24, selectedId: null, view: 'list', map: null, markers: [], mapReady: false, mapKey: '' };
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, x =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[x])
@@ -237,6 +238,9 @@ window.addEventListener('message', event => {
 });
 matchMedia('(max-width:720px)').addEventListener('change', syncLayout);
 function bindEvents() {
+  $('query').value = state.query;
+  $('province').value = state.province;
+  $('category').value = state.category;
   for (const [id, type] of [['roadmap-type', 'roadmap'], ['satellite-type', 'hybrid']]) {
     $(id).addEventListener('click', () => {
       if (!state.mapReady) return;

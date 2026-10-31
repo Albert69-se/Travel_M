@@ -7,7 +7,7 @@
  * `validateTrip`/`createTrip` read: name, destination, startDate, endDate, budget.
  */
 import { useEffect, useId, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertCircle, CalendarDays, MapPin, Plus, Trash2, Wallet } from 'lucide-react';
 
 import {
@@ -75,7 +75,7 @@ function TripForm({ initial = BLANK_TRIP, submitLabel = 'Save trip', onSubmit, o
         label="Destination"
         htmlFor={fieldId('destination')}
         error={errors.destination}
-        hint="Free text — the label shown on the trip, not a place record."
+        hint="A city or region, such as Chiang Mai."
       >
         <TextInput
           id={fieldId('destination')}
@@ -112,7 +112,7 @@ function TripForm({ initial = BLANK_TRIP, submitLabel = 'Save trip', onSubmit, o
         label="Expected budget"
         htmlFor={fieldId('budget')}
         error={errors.budget}
-        hint="Zero or more, in the trip's own currency."
+        hint="Your total planned spend. You can change this later."
       >
         <TextInput
           id={fieldId('budget')}
@@ -185,18 +185,20 @@ function ConfirmDelete({ onConfirm }) {
 export default function TripsView() {
   const { trips, user, createTrip, deleteTrip } = useData();
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const [creating, setCreating] = useState(false);
   const [actionError, setActionError] = useState('');
 
   const mine = trips.filter((trip) => user && trip.userId === user.id);
   const ordered = [...mine].sort((a, b) => (a.startDate < b.startDate ? 1 : -1));
-  const showForm = creating || ordered.length === 0;
+  const showForm = creating || params.get('new') === '1' || ordered.length === 0;
 
   const handleCreate = (values) => {
     setActionError('');
     const result = createTrip(values);
     if (!result.ok) return result;
     setCreating(false);
+    navigate(`/trips/${result.trip.id}`);
     return result;
   };
 
@@ -222,7 +224,7 @@ export default function TripsView() {
             variant="primary"
             icon={Plus}
             aria-expanded={showForm}
-            onClick={() => setCreating((open) => !open)}
+            onClick={() => { setCreating(!showForm); setParams({}, { replace: true }); }}
           >
             {showForm ? 'Close form' : 'New trip'}
           </Button>
@@ -249,21 +251,21 @@ export default function TripsView() {
 
       {showForm ? (
         <Card>
-          <CardHeader title="New trip" meta="Checked by the trip rules before anything is stored" />
+          <CardHeader title="New trip" meta="Pick a destination and dates. The details can come later." />
           <Divider className="my-3" />
           <TripForm
             submitLabel="Create trip"
             onSubmit={handleCreate}
-            onCancel={ordered.length > 0 ? () => setCreating(false) : undefined}
+            onCancel={ordered.length > 0 ? () => { setCreating(false); setParams({}, { replace: true }); } : undefined}
           />
         </Card>
       ) : null}
 
       {ordered.length > 0 ? (
-        <ul className="flex flex-col gap-2">
+        <ul className="tm-trips-grid">
           {ordered.map((trip) => (
             <li key={trip.id}>
-              <Card className="flex flex-wrap items-start justify-between gap-3">
+              <Card className="tm-trip-card flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link

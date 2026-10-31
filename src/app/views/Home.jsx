@@ -1,34 +1,23 @@
 /**
- * Home — the compact dashboard from the Stitch "Travel M - Home Dashboard"
- * screen: a greeting and countdown header, the trip the traveller is planning
- * (with its budget panel), three compact stat cards, then the upcoming plan
- * beside the destination forecast.
- *
- * A guest gets the same frame, but the trip and budget cards are replaced with
- * what a guest can do, what needs an account, the published demo credentials and
- * a strip of sample places.
- *
- * Every figure comes from the records: budget maths is read from `useTripData`,
- * day grouping from `activityGroups`, and the forecast is only ever the shape
- * the weather provider returned — never an invented temperature.
+ * Guest discovery workspace and signed-in trip dashboard.
+ * Planning figures come from useTripData; weather stays provider-backed.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowRight,
+  ArrowUpRight,
   Backpack,
   CalendarDays,
   CloudSun,
   Compass,
   Droplets,
-  LogIn,
   MapPin,
   Receipt,
   Route,
   Search,
   Thermometer,
-  UserPlus,
 } from 'lucide-react';
 
 import {
@@ -37,7 +26,6 @@ import {
   CardHeader,
   EmptyState,
   FinePrint,
-  KeyValue,
   Notice,
   ProgressBar,
   Row,
@@ -55,15 +43,14 @@ import {
   shortDate,
   weekdayDate,
 } from '../lib/format.js';
-import { DEMO_CREDENTIALS } from '../../core/auth.js';
 import { getWeatherForPlace, hasTemperature } from '../../core/weather.js';
 
 /* Navigation is a link, not a button, so it keeps middle-click and keyboard
    behaviour. The classes mirror the Button primitive's variants. */
 const LINK_PRIMARY =
-  'tm-focus inline-flex h-[34px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control bg-accent px-3 text-body font-medium text-white transition-colors hover:bg-accent-hover';
+  'tm-focus inline-flex h-[44px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control bg-accent px-3 text-body font-medium text-white transition-colors hover:bg-accent-hover';
 const LINK_SECONDARY =
-  'tm-focus inline-flex h-[34px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control border border-line bg-surface px-3 text-body font-medium text-ink transition-colors hover:border-line-strong';
+  'tm-focus inline-flex h-[44px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control border border-line bg-surface px-3 text-body font-medium text-ink transition-colors hover:border-line-strong';
 const LINK_QUIET =
   'tm-focus inline-flex items-center gap-1 rounded-control text-label font-medium text-accent hover:underline';
 
@@ -370,7 +357,7 @@ function Dashboard({ user }) {
   const underWay = trip ? daysUntil(trip.startDate) < 0 : false;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="tm-dashboard flex flex-col gap-6">
       <PageHeader
         title={greetingFor(user.name)}
         subtitle={trip ? countdown : 'No trip planned yet — create one to start a countdown.'}
@@ -407,8 +394,8 @@ function Dashboard({ user }) {
         </Card>
       ) : (
         <>
-          <Card padded={false} className="overflow-hidden">
-            <div className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+          <Card padded={false} className="tm-current-trip overflow-hidden">
+            <div className="grid gap-6 p-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -501,68 +488,57 @@ function Dashboard({ user }) {
 
 /* ------------------------------------------------------------------ the guest */
 
-function CredentialPanel() {
-  return (
-    <div className="rounded-control border border-line bg-sunken px-3 py-2">
-      <p className="text-micro font-semibold uppercase text-ink-tertiary">Published demo account</p>
-      <div className="mt-1 divide-y divide-line">
-        <KeyValue label="Email">{DEMO_CREDENTIALS.email}</KeyValue>
-        <KeyValue label="Password">{DEMO_CREDENTIALS.password}</KeyValue>
-      </div>
-    </div>
-  );
-}
-
 function GuestHome() {
-  const { places } = useData();
-  const featured = places.filter(p => !p.archived).slice(0, 4);
-  return (
-    <div className="flex flex-col gap-4">
-      <section className="tm-hero">
-        <div className="tm-hero-copy">
-          <p className="tm-eyebrow">Less planning. More discovering.</p>
-          <h1>Your next adventure,<br />a little closer.</h1>
-          <p>From northern mountain trails to streets full of flavour. Find your places, make a plan, and enjoy Thailand at your own pace.</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/discover" className={`${LINK_PRIMARY} !h-11 !px-5`}>Explore Thailand <ArrowRight size={16} /></Link>
-            <Link to="/signin" className={`${LINK_SECONDARY} !h-11 !px-5`}>Plan a trip</Link>
-          </div>
-        </div>
-        <svg viewBox="0 0 460 360" className="tm-hero-art" role="img" aria-label="Illustration of a mountain journey and a northern Thai temple" preserveAspectRatio="xMidYMid slice">
-          <rect width="460" height="360" fill="#e6eee6" />
-          <circle cx="315" cy="90" r="46" fill="#e8bc69" />
-          <path d="M0 218L90 88L180 204L270 130L410 243L460 190V360H0Z" fill="#bacdb8" />
-          <path d="M0 270L140 163L260 260L390 166L460 235V360H0Z" fill="#82a793" />
-          <path d="M0 309Q120 228 260 294T460 265V360H0Z" fill="#397e69" />
-          <path d="M70 360Q125 295 252 316T397 279" fill="none" stroke="#e9dfb8" strokeWidth="15" />
-          <path d="M284 263V222H344V263Z" fill="#f3e6c7" />
-          <path d="M270 224L314 191L358 224Z M284 204L314 172L344 204Z M301 181L314 150L327 181Z" fill="#996e44" />
-          <path d="M308 263V241Q314 231 320 241V263Z" fill="#4c6b53" />
-          <g fill="#246451"><path d="M36 304L58 244L80 304Z"/><path d="M398 315L420 245L442 315Z"/></g>
-          <path d="M165 191C165 170 197 170 197 191C197 203 181 218 181 218S165 203 165 191Z" fill="#147d70" stroke="#fff" strokeWidth="3"/><circle cx="181" cy="190" r="5" fill="white"/>
-          <path d="M190 235Q217 229 239 245" stroke="white" strokeWidth="2" strokeDasharray="4 5" fill="none"/>
-        </svg>
-      </section>
-      <div>
-        <div className="tm-home-section"><div><p className="tm-eyebrow">Start somewhere wonderful</p><h2>A few places to spark a plan</h2></div><Link to="/discover" className={LINK_QUIET}>View all places <ArrowRight size={15} /></Link></div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {featured.map((place, i) => <Card key={place.id} className="tm-feature-card">
-            <div className="flex items-center justify-between"><span className="tm-feature-number">0{i + 1} / {place.category}</span><MapPin size={15} className="text-accent" /></div>
-            <PlacePhoto place={place} size={90} />
-            <GoogleAttribution place={place} />
-            <div><h3><Link to={`/discover/${place.id}`} className="tm-focus hover:text-accent">{place.name}</Link></h3><p className="mt-1 text-label text-ink-secondary">{place.locality}</p></div>
-          </Card>)}
-        </div>
+  const { places, signInAsDemo } = useData();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
+  const [demoBusy, setDemoBusy] = useState(false);
+  const [demoError, setDemoError] = useState('');
+  const featured = places.filter(place => !place.archived).slice(0, 3);
+  const tryDemo = async () => {
+    setDemoBusy(true);
+    setDemoError('');
+    try {
+      const result = await signInAsDemo();
+      if (!result.ok) setDemoError(result.errors?.form || 'Could not open the demo. Please try again.');
+    } catch { setDemoError('Could not open the demo. Please try again.'); }
+    finally { setDemoBusy(false); }
+  };
+  return <div className="tm-home">
+    <section className="tm-welcome">
+      <div className="tm-welcome-copy">
+        <p className="tm-eyebrow">Thailand, at your own pace</p>
+        <h1>A place to go.<br /><em>A plan to make.</em></h1>
+        <p>Find the quiet corners and the can't-miss stops. Bring them together in a trip that feels like yours.</p>
+        <form className="tm-home-search" onSubmit={event => { event.preventDefault(); navigate(`/discover${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`); }} role="search">
+          <label className="sr-only" htmlFor="home-search">Search places in northern Thailand</label>
+          <Search size={20} aria-hidden="true" />
+          <input id="home-search" type="search" placeholder="Temples, waterfalls, markets…" value={query} onChange={event => setQuery(event.target.value)} />
+          <button type="submit" className="tm-action tm-action-primary">Explore <ArrowRight size={17} aria-hidden="true" /></button>
+        </form>
+        <div className="tm-search-suggestions"><span>Go by feeling</span>{['Culture', 'Nature', 'Food'].map(category => <Link key={category} to={`/discover?category=${category}`} className="tm-focus">{category} <ArrowRight size={13} aria-hidden="true" /></Link>)}</div>
       </div>
-      <div className="grid gap-4 md:grid-cols-3 mt-3">
-        {[{icon: Compass, title: 'Find your kind of place', text: 'Explore culture, nature and food with a map that keeps you oriented.'}, {icon: Route, title: 'Give each day a direction', text: 'Save your favourites and bring them together in a day-by-day itinerary.'}, {icon: Backpack, title: 'Leave with less on your mind', text: 'Keep your packing, expenses and destination weather beside your plan.'}].map(item => <div key={item.title} className="flex gap-3 p-3"><item.icon size={22} className="shrink-0 text-accent" /><div><h2 className="font-semibold">{item.title}</h2><p className="mt-2 text-body text-ink-secondary">{item.text}</p></div></div>)}
+      <aside className="tm-start-card">
+        <span className="tm-start-mark"><Route size={30} strokeWidth={1.3} aria-hidden="true" /></span>
+        <p className="tm-eyebrow">From someday to a plan</p>
+        <h2>Good trips start<br />with a little space.</h2>
+        <ol><li><span>01</span>Save somewhere you love</li><li><span>02</span>Give each day a direction</li><li><span>03</span>Pack, budget, and go</li></ol>
+        <Link to="/trips?new=1" className="tm-action tm-action-light">Start your trip <ArrowUpRight size={17} aria-hidden="true" /></Link>
+        <p className="tm-start-note">Free to explore. Sign in to keep a plan.</p>
+      </aside>
+    </section>
+    <section aria-labelledby="regions-heading">
+      <div className="tm-section-heading"><div><p className="tm-eyebrow">Two ways north</p><h2 id="regions-heading">Where will you wander?</h2></div><Link to="/discover" className="tm-text-link tm-focus">Explore all places <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="tm-region-grid">
+        {[{ name: 'Chiang Mai', tagline: 'Mountain air. Old-town mornings.', text: 'Temples, forest trails and markets worth lingering in.', icon: Compass }, { name: 'Chiang Rai', tagline: 'Take the slower road north.', text: 'Art, hill-country scenery and a change of pace.', icon: MapPin }].map((region, i) => <Link key={region.name} to={`/discover?province=${encodeURIComponent(region.name + ' Province')}`} className={`tm-region-card tm-focus tm-region-${i}`}><div className="tm-region-top"><region.icon size={27} strokeWidth={1.2} aria-hidden="true" /><span>NORTHERN THAILAND / 0{i + 1}</span><ArrowUpRight size={21} aria-hidden="true" /></div><h3>{region.name}</h3><p className="tm-region-tagline">{region.tagline}</p><p>{region.text}</p></Link>)}
       </div>
-      <Card className="tm-demo-banner">
-        <div><p className="tm-eyebrow">Take a look around</p><h2 className="text-section font-semibold">A weekend in Chiang Mai, already planned.</h2><p className="mt-2 text-body text-ink-secondary">Try the demo account to explore a sample itinerary, packing list and budget. Your changes stay in this browser.</p><div className="mt-4 flex flex-wrap gap-2"><Link to="/signin" className={LINK_PRIMARY}><LogIn size={15} /> Try the demo</Link><Link to="/register" className={LINK_SECONDARY}><UserPlus size={15} /> Create account</Link></div></div>
-        <CredentialPanel />
-      </Card>
-    </div>
-  );
+    </section>
+    <section aria-labelledby="featured-heading">
+      <div className="tm-section-heading"><div><p className="tm-eyebrow">A starting point</p><h2 id="featured-heading">Make room for discovery</h2></div><span className="text-label text-ink-secondary">Sample places · details unverified</span></div>
+      <div className="tm-feature-grid">{featured.map(place => <article className="tm-feature-card" key={place.id}><PlacePhoto place={place} hero className="tm-feature-photo" /><div className="tm-feature-copy"><span className="tm-eyebrow">{place.category}</span><h3><Link to={`/discover/${place.id}`} className="tm-focus">{place.name} <ArrowUpRight size={17} aria-hidden="true" /></Link></h3><p>{place.locality}</p><GoogleAttribution place={place} /></div></article>)}</div>
+    </section>
+    <section className="tm-demo-strip"><div><p className="tm-eyebrow">Take it for a spin</p><h2>A weekend in Chiang Mai. Already planned.</h2><p>Explore a sample itinerary, packing list and budget. Changes stay in this browser.</p>{demoError && <p role="alert" className="text-danger">{demoError}</p>}</div><button type="button" className="tm-action tm-action-primary" disabled={demoBusy} onClick={tryDemo}>{demoBusy ? 'Opening demo…' : 'Try the demo'}<ArrowRight size={17} aria-hidden="true" /></button></section>
+  </div>;
 }
 
 /* ---------------------------------------------------------------------- page */

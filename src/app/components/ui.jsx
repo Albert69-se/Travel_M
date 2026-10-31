@@ -5,6 +5,7 @@
  * than a component library, so the tokens in `styles/index.css` stay the single
  * place where geometry, colour and type are decided.
  */
+import { cloneElement, isValidElement } from 'react';
 import { ChevronDown, Inbox } from 'lucide-react';
 
 /* ------------------------------------------------------------------- layout */
@@ -21,7 +22,7 @@ export function CardHeader({ title, meta, action, className = '' }) {
   return (
     <div className={`flex items-start justify-between gap-3 ${className}`}>
       <div className="min-w-0">
-        <h2 className="text-card-title font-semibold text-ink truncate">{title}</h2>
+        <h2 className="text-card-title font-semibold text-ink break-words">{title}</h2>
         {meta ? <p className="mt-0.5 text-label text-ink-tertiary tm-numeric">{meta}</p> : null}
       </div>
       {action}
@@ -56,8 +57,8 @@ const BUTTON_VARIANTS = {
 };
 
 const BUTTON_SIZES = {
-  md: 'h-[40px] px-3 text-body',
-  sm: 'h-[34px] px-2.5 text-label',
+  md: 'h-[44px] px-3 text-body',
+  sm: 'h-[40px] px-2.5 text-label',
 };
 
 export function Button({
@@ -83,14 +84,14 @@ export function Button({
   );
 }
 
-export function IconButton({ icon: Icon, label, className = '', size = 36, ...rest }) {
+export function IconButton({ icon: Icon, label, className = '', size = 44, ...rest }) {
   return (
     <button
       type="button"
       aria-label={label}
       title={label}
       className={`tm-focus inline-flex shrink-0 items-center justify-center rounded-control text-ink-tertiary transition-colors hover:bg-canvas hover:text-ink ${className}`}
-      style={{ width: size, height: size }}
+      style={{ width: Math.max(44, size), height: Math.max(44, size) }}
       {...rest}
     >
       <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
@@ -103,7 +104,7 @@ export function Chip({ selected = false, className = '', children, ...rest }) {
     <button
       type="button"
       aria-pressed={selected}
-      className={`tm-focus inline-flex h-[34px] items-center rounded-chip border px-2.5 text-label font-medium transition-colors ${
+      className={`tm-focus inline-flex h-[44px] items-center rounded-chip border px-2.5 text-label font-medium transition-colors ${
         selected
           ? 'border-accent bg-tint text-accent'
           : 'border-line bg-surface text-ink-secondary hover:border-line-strong hover:text-ink'
@@ -120,7 +121,7 @@ export function SegmentedControl({ options, value, onChange, label, className = 
     <div
       role="group"
       aria-label={label}
-      className={`inline-flex h-[34px] items-center gap-0.5 rounded-control border border-line bg-surface p-0.5 ${className}`}
+      className={`inline-flex h-[44px] items-center gap-0.5 rounded-control border border-line bg-surface p-0.5 ${className}`}
     >
       {options.map((option) => {
         const active = option.value === value;
@@ -130,7 +131,7 @@ export function SegmentedControl({ options, value, onChange, label, className = 
             type="button"
             aria-pressed={active}
             onClick={() => onChange(option.value)}
-            className={`tm-focus inline-flex h-[26px] items-center gap-1.5 rounded-[6px] px-2.5 text-label font-medium transition-colors ${
+            className={`tm-focus inline-flex h-[36px] items-center gap-1.5 rounded-[6px] px-2.5 text-label font-medium transition-colors ${
               active ? 'bg-tint text-accent' : 'text-ink-secondary hover:bg-canvas hover:text-ink'
             }`}
           >
@@ -200,8 +201,8 @@ export function Stat({ label, value, hint, tone = 'default', progress = null, cl
 export function KeyValue({ label, children, className = '' }) {
   return (
     <div className={`flex items-baseline justify-between gap-3 py-1.5 ${className}`}>
-      <span className="text-label text-ink-tertiary">{label}</span>
-      <span className="text-body font-medium text-ink tm-numeric text-right">{children}</span>
+      <span className="shrink-0 text-label text-ink-tertiary">{label}</span>
+      <span className="min-w-0 break-words text-body font-medium text-ink tm-numeric text-right">{children}</span>
     </div>
   );
 }
@@ -209,6 +210,11 @@ export function KeyValue({ label, children, className = '' }) {
 /* --------------------------------------------------------------------- forms */
 
 export function Field({ label, htmlFor, error, hint, className = '', children }) {
+  const descriptionId = htmlFor && (error || hint) ? `${htmlFor}-description` : undefined;
+  const control = isValidElement(children) ? cloneElement(children, {
+    'aria-invalid': error ? true : undefined,
+    'aria-describedby': [children.props['aria-describedby'], descriptionId].filter(Boolean).join(' ') || undefined,
+  }) : children;
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
       {label ? (
@@ -216,20 +222,20 @@ export function Field({ label, htmlFor, error, hint, className = '', children })
           {label}
         </label>
       ) : null}
-      {children}
+      {control}
       {error ? (
-        <p className="text-label text-danger" role="alert">
+        <p id={descriptionId} className="text-label text-danger" role="alert">
           {error}
         </p>
       ) : hint ? (
-        <p className="text-label text-ink-tertiary">{hint}</p>
+        <p id={descriptionId} className="text-label text-ink-tertiary">{hint}</p>
       ) : null}
     </div>
   );
 }
 
 const CONTROL_CLASS =
-  'tm-focus h-[34px] w-full rounded-control border border-line bg-surface px-2.5 text-body text-ink transition-colors hover:border-line-strong disabled:bg-canvas disabled:text-ink-tertiary';
+  'tm-focus h-[44px] w-full rounded-control border border-line bg-surface px-2.5 text-body text-ink transition-colors hover:border-line-strong disabled:bg-canvas disabled:text-ink-tertiary';
 
 export function TextInput({ className = '', ...rest }) {
   return <input className={`${CONTROL_CLASS} ${className}`} {...rest} />;
@@ -257,7 +263,7 @@ export function Select({ className = '', children, ...rest }) {
 
 export function Checkbox({ label, className = '', ...rest }) {
   return (
-    <label className={`inline-flex cursor-pointer items-center gap-2 ${className}`}>
+    <label className={`inline-flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center gap-2 ${className}`}>
       <input
         type="checkbox"
         className="tm-focus size-4 shrink-0 cursor-pointer rounded-[4px] border-line accent-accent"

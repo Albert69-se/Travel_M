@@ -91,3 +91,67 @@ h1 { font-size: 28px; letter-spacing: -.8px; }
   .panel-open #map { height: 260px; }
   .panel-open .details { border-radius: 0; border: 0; padding: 20px 16px 28px; }
 }
+
+/* Shared travel-notebook theme; behavior and mobile detail isolation stay intact. */
+:root { color: #213e35; background: #f6f4ef; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+.embedded { background: #f6f4ef; }
+.intro { margin: 0 0 24px; }
+.eyebrow { color: #24674f; font-size: 10px; font-weight: 600; letter-spacing: .16em; margin-bottom: 12px; }
+h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 400; letter-spacing: -.035em; line-height: 1.12; margin-bottom: 14px; }
+.subtitle { color: #59675f; font-size: 14px; line-height: 1.8; }
+.disclosure { display: block; background: transparent; border: 0; border-left: 2px solid #b2bea8; border-radius: 0; padding: 4px 14px; color: #59675f; font-size: 12px; margin-bottom: 24px; }
+.disclosure summary { cursor: pointer; min-height: 44px; align-content: center; color: #43594c; font-weight: 500; }
+.disclosure p { margin: 0 0 8px; max-width: 750px; }
+.toolbar { background: #fffefa; border-color: #e1e2d8; border-radius: 14px; padding: 20px; gap: 14px; }
+.toolbar label > span { color: #43594c; font-size: 12px; }
+.toolbar input, .toolbar select { min-height: 46px; border-color: #d1d8cc; border-radius: 8px; font-size: 14px; }
+.view-switch { height: 46px; background: #eeeee6; }
+.view-switch button { height: 40px; min-width: 64px; font-size: 13px; }
+.view-switch button.active { background: #24674f; color: white; box-shadow: none; }
+.status { font-size: 13px; color: #59675f; margin: 20px 0; }
+.section-heading { font-size: 15px; padding-bottom: 20px; }
+.section-heading span { color: #59675f; font-size: 12px; }
+.places { gap: 20px; }
+.place-row { border-radius: 14px; border-color: #e1e2d8; }
+.place-row:hover { border-color: #7b987d; box-shadow: 0 4px 14px #213e350a; }
+.place-row.selected { border-color: #24674f; box-shadow: 0 0 0 1px #24674f; background: #f0f3ea; }
+.place-symbol { background: #eeeee6; color: #5e745b; }
+.place-symbol.nature { background: #e8eedf; color: #506c49; }
+.place-symbol.food { background: #f2e8d6; color: #866833; }
+.photo-placeholder small { color: #59675f; }
+.place-body { padding: 20px; }
+.place-title { font-size: 16px; line-height: 1.45; color: #213e35; font-weight: 600; }
+.place-meta { color: #59675f; font-size: 12px; margin-top: 8px; }
+.place-subtitle { color: #24674f; font-size: 12px; margin-top: 20px; }
+.save-mini { width: 44px; height: 44px; color: #43594c; border-color: #d1d8cc; }
+.details { border-color: #e1e2d8; border-radius: 14px; padding: 24px; }
+.detail-title { font-family: Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.15; }
+.detail-copy { font-size: 14px; line-height: 1.8; color: #59675f; }
+.detail-province { font-size: 13px; color: #59675f; }
+.detail-heading { font-size: 12px; color: #43594c; }
+.fact span { font-size: 12px; color: #59675f; }
+.fact b { font-size: 14px; }
+.source { font-size: 12px; color: #59675f; }
+.btn { min-height: 44px; font-size: 13px; font-weight: 500; color: #24674f; }
+.btn.primary { background: #24674f; border-color: #24674f; }
+.btn.primary:hover { background: #1b503d; }
+.map-types button { min-height: 44px; font-size: 13px; }
+.map-types button[aria-pressed="true"] { color: #24674f; background: #e8eee3; }
+.map-caption, .footer { font-size: 12px; color: #59675f; }
+.itinerary-form label, .itinerary-form p { font-size: 13px; }
+.itinerary-form select, .itinerary-form input { min-height: 44px; }
+.reset-filters, .show-more { min-height: 44px; color: #24674f; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid #24674f; outline-offset: 3px; }
+@media (max-width: 1000px) { .places { gap: 14px; } }
+@media (max-width: 720px) {
+  h1 { font-size: 34px; }
+  .toolbar { padding: 14px; }
+  .toolbar input, .toolbar select, .itinerary-form input, .itinerary-form select { font-size: 16px; }
+  .place-body { padding: 14px; }
+  .place-title { font-size: 15px; }
+  .places { gap: 12px; }
+  .disclosure { margin-bottom: 20px; }
+  .panel-open .back-results { padding-top: max(16px, env(safe-area-inset-top)); }
+  .panel-open .details { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 420px) { .places { grid-template-columns: 1fr; } }

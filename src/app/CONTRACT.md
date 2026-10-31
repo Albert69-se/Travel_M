@@ -6,25 +6,18 @@ outside the ones you were asked to write.
 
 ## 1. Design system
 
-Source of truth: `src/styles/index.css` (Tailwind v4 `@theme` tokens), generated from the
-Stitch design system "Travel M". Use these Tailwind utilities only — no raw hex values in
-class names, no gradients, no emoji, no decorative flourishes.
+The October 2026 UX overhaul supersedes the original Stitch visual constraints.
+`src/styles/index.css` owns the Tailwind tokens and shared workspace classes. Use
+warm paper surfaces, forest-green actions, readable UI text and system-serif
+editorial headings. Discover's embedded catalog matches these in
+`public/catalog/catalog.css`. Keep both themes consistent when changing tokens.
 
-- Surfaces: `bg-canvas` `bg-surface` `bg-sunken` `border-line` `border-line-strong`
-- Text: `text-ink` `text-ink-secondary` `text-ink-tertiary`
-- Accent: `bg-accent` `text-accent` `bg-tint` `border-accent`
-- Semantic: `text-success` `bg-success-bg` `text-warning` `bg-warning-bg` `text-danger` `bg-danger-bg`
-- Type: `text-micro` (11px, uppercase micro-label) `text-label` (12px) `text-body` (13px)
-  `text-base` (14px) `text-card-title` (15px) `text-section` (18px) `text-title` (24px)
-  `text-metric` (22px, big numbers). Weights: `font-normal` `font-medium` `font-semibold` only — never bold.
-- Geometry: `rounded-card` (12px, cards) `rounded-control` (8px, buttons/inputs) `rounded-chip` (pills)
-- Elevation: `shadow-card` `shadow-popover` `shadow-modal`; the `.tm-card` class = white surface +
-  1px hairline + card radius + micro shadow
-- Money and counts: add `tm-numeric` (tabular figures)
-- Focus: controls carry `.tm-focus`; icons are `lucide-react` at `size={15..18} strokeWidth={1.75}`
-
-Density: list/table rows ≈44px, chips 26px, badges 20px, buttons and inputs 34px, card padding
-`p-4`, spacing from an 8px grid (`gap-2`=8, `gap-3`=12, `gap-4`=16, `gap-6`=24).
+- Use semantic tokens for surfaces, text, accent and feedback.
+- Main controls and form inputs are 44px tall; mobile text inputs are at least 16px.
+- Shared primitives in `components/ui.jsx` provide visible focus and associated field errors.
+- Preserve real photo attribution and honest placeholders. Do not invent ratings or place facts.
+- The home search and destination shortcuts use validated URL filters in
+  `public/catalog/catalog-navigation.mjs`.
 
 ## 2. Primitives — `src/app/components/ui.jsx`
 
@@ -175,21 +168,27 @@ Hard rules:
 
 ## 6. Layout and responsiveness
 
-The shell (`src/app/layout/Shell.jsx`) is built: a 228px rail on `lg`, a 64px icon rail on `md`, a 52px
-bottom tab bar on phones, page content inside a `max-w-[1120px]` column, and a status toast. A view only
-renders its own content.
+The shared shell uses a 240px desktop sidebar above 1100px, an 80px icon rail
+at 768–1100px, and a mobile header with bottom navigation below 768px. Mobile
+navigation and notifications account for safe-area insets. Trip sections live
+inside the trip workspace; the sidebar offers one contextual trip shortcut.
 
-- Every view starts with a page header: `text-title font-semibold text-ink` plus a
-  `text-body text-ink-secondary` subtitle, actions right-aligned via
-  `flex flex-wrap items-start justify-between gap-3`.
-- Multi-column workspaces: `grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]`, collapsing to one
-  column below `lg`. Nothing may overflow horizontally at 390px wide.
-- Interactive targets ≥34px tall (rows 44px); real `<button>`/`<label>` elements; `aria-label` on
-  icon-only controls; `role="alert"` on error text; `aria-live="polite"` on async results.
-- Long lists scroll inside their card (`max-h-[560px] overflow-y-auto tm-scroll`), never the page.
+Views render their own content inside `.tm-main`. Headers use the shared type
+scale; landing-page editorial headings may use the system serif stack. Grids
+must collapse without horizontal page overflow at 320px. Prefer natural page
+scrolling for place collections. Keep horizontal trip tabs accessible on mobile.
+Use named controls, explicit field labels and visible focus states.
+
+Discover's mobile detail panel must remain isolated and restore the parent's
+browsing scroll position on close. Preserve Map/Satellite controls and actual
+Google hybrid map mode. Catalog records currently retain their existing OSM
+attribution; do not mislabel these as Google-sourced records.
 
 ## 7. Verify before you report
 
-From `/Users/Xcalibur/Documents/GitHub/Travel_M_React` run
-`npx oxlint src/app/views/<your-file>.jsx` and fix what it reports about your own files.
-Do not run a production build — the parent runs it. Report only what you actually wrote and verified.
+Run `npm run lint`, `npm test`, `npm run build`, and
+`node --test server/catalog.test.mjs server/static-server.test.mjs`.
+Server tests require permission to bind a local port. Use the browser to inspect
+desktop/tablet/mobile layouts and end-to-end flows when browser access is enabled.
+If it is disabled, report that limitation explicitly; automated checks are not
+proof of visual correctness. See `docs/EXECPLAN_UX_OVERHAUL.md` for the audit.

@@ -32,9 +32,9 @@ import { DEMO_CREDENTIALS } from '../../core/auth.js';
 import { STORAGE_KEYS } from '../../core/storage.js';
 
 const LINK_PRIMARY =
-  'tm-focus inline-flex h-[34px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control bg-accent px-3 text-body font-medium text-white transition-colors hover:bg-accent-hover';
+  'tm-focus inline-flex h-[44px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control bg-accent px-3 text-body font-medium text-white transition-colors hover:bg-accent-hover';
 const LINK_SECONDARY =
-  'tm-focus inline-flex h-[34px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control border border-line bg-surface px-3 text-body font-medium text-ink transition-colors hover:border-line-strong';
+  'tm-focus inline-flex h-[44px] items-center justify-center gap-1.5 whitespace-nowrap rounded-control border border-line bg-surface px-3 text-body font-medium text-ink transition-colors hover:border-line-strong';
 
 /** What each storage key actually holds, so the list is not just bare strings. */
 const KEY_NOTES = {
@@ -191,19 +191,18 @@ export default function AccountView() {
         <Card className="flex flex-col gap-3">
           <CardHeader
             title="Profile"
-            meta="Held in the account record"
+            meta="Your local profile"
             action={<Badge tone="accent">Signed in</Badge>}
           />
           <div className="divide-y divide-line border-t border-line pt-1">
             <KeyValue label="Name">{user.name}</KeyValue>
             <KeyValue label="Email">{user.email}</KeyValue>
-            <KeyValue label="User id">{user.id}</KeyValue>
           </div>
-          <FinePrint>There is no avatar and no rating — the account record holds text fields only.</FinePrint>
+          <FinePrint>Your profile and plans are saved on this device.</FinePrint>
         </Card>
 
         <Card className="flex flex-col gap-3">
-          <CardHeader title="Records owned by this account" meta="Counted from stored records" />
+          <CardHeader title="Your travel notebook" meta="Everything you have planned so far" />
           <div className="divide-y divide-line border-t border-line pt-1">
             <KeyValue label="Trips">{String(owned.trips)}</KeyValue>
             <KeyValue label="Saved places">{String(owned.savedPlaces)}</KeyValue>
@@ -212,15 +211,16 @@ export default function AccountView() {
             <KeyValue label="Expenses">{String(owned.expenses)}</KeyValue>
           </div>
           <p className="text-label text-ink-secondary">
-            Each record carries the id of the account that created it, and only this account&apos;s records are returned
-            by the data layer.
+            Your trips, favourites and lists are kept together in this account.
           </p>
         </Card>
       </div>
 
-      <Card className="flex flex-col gap-3">
+      <details className="tm-card p-5">
+        <summary className="tm-focus cursor-pointer text-body font-medium">About storage on this device</summary>
+        <div className="mt-4 flex flex-col gap-3">
         <CardHeader
-          title="Where these records live"
+          title="Local storage details"
           meta="localStorage keys written by the data layer"
           action={
             <span className="inline-flex items-center gap-1.5 text-label text-ink-tertiary">
@@ -248,26 +248,27 @@ export default function AccountView() {
           hashes rather than text — but localStorage is readable by anyone with access to this browser profile. This
           prototype has no server and no shared storage, so it is not a substitute for server-side authentication.
         </Notice>
-      </Card>
+        </div>
+      </details>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="flex flex-col gap-3">
           <CardHeader title="Demo account" meta="Published credentials" />
           <CredentialPanel />
           <p className="text-label text-ink-secondary">
-            Signing in with it exercises the same verification path as a typed login.
+            Use this account to explore a ready-made trip before creating your own.
           </p>
         </Card>
 
         <Card className="flex flex-col gap-3">
           <CardHeader
             title="Reset sample data"
-            meta="Restores the seeded records"
+            meta="Start over with the original sample trip"
             action={<Badge tone="danger">Destructive</Badge>}
           />
           <p className="text-label text-ink-secondary">
-            This clears every stored key and re-seeds the sample set. Accounts are cleared with it, including this one,
-            so you will be signed out and the demo account will be created again on the next load.
+            This permanently removes all TravelM accounts and plans saved in this browser, then restores the demo.
+            You will be signed out. This cannot be undone.
           </p>
 
           {confirming ? (

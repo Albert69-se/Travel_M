@@ -244,7 +244,7 @@ export default function TripLayout() {
 
       {editing ? (
         <Card>
-          <CardHeader title="Edit trip" meta="Changes are checked before anything is stored" />
+          <CardHeader title="Edit trip" meta="Update your destination, dates or budget." />
           <Divider className="my-3" />
           <TripForm
             initial={{
@@ -261,7 +261,7 @@ export default function TripLayout() {
         </Card>
       ) : null}
 
-      <nav aria-label="Trip sections" className="border-b border-line">
+      <nav aria-label="Trip sections" className="tm-trip-tabs border-b border-line">
         <ul className="tm-scroll -mb-px flex gap-1 overflow-x-auto">
           {TABS.map((tab) => (
             <li key={tab.label} className="shrink-0">
@@ -269,7 +269,7 @@ export default function TripLayout() {
                 to={`/trips/${trip.id}${tab.segment ? `/${tab.segment}` : ''}`}
                 end={tab.end}
                 className={({ isActive }) =>
-                  `tm-focus relative inline-flex h-[34px] items-center gap-1.5 whitespace-nowrap px-2.5 text-body font-medium transition-colors ${
+                  `tm-focus relative inline-flex h-[44px] items-center gap-1.5 whitespace-nowrap px-2.5 text-body font-medium transition-colors ${
                     isActive ? 'text-accent' : 'text-ink-secondary hover:text-ink'
                   }`
                 }

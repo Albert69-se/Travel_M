@@ -69,7 +69,7 @@ export default function SignInView() {
         <div className="min-w-0">
           <h1 className="text-title font-semibold text-ink">Sign in</h1>
           <p className="mt-1 text-body text-ink-secondary">
-            Trips, saved places, itinerary, packing and expenses belong to the account that created them.
+            Welcome back. Your places and plans are right where you left them.
           </p>
         </div>
         <Link to="/register" className={`${LINK_QUIET} pt-2`}>
@@ -144,9 +144,8 @@ export default function SignInView() {
           </Card>
 
           <Notice tone="warning" icon={AlertTriangle}>
-            Accounts and their records live in this browser&apos;s localStorage. Isolation between accounts is enforced
-            by the data layer, but anyone with access to this browser profile can read the stored records. Passwords are
-            hashed with PBKDF2-HMAC-SHA256 and never stored as text.
+            This is a local prototype. Your account and plans stay in this browser and do not sync between devices.
+            Anyone using this browser profile can access stored records. Use a demo password you do not use elsewhere.
           </Notice>
         </div>
       </div>

@@ -29,7 +29,7 @@ function RequireSignIn({ children }) {
   const location = useLocation();
 
   if (!ready) return null;
-  if (!user) return <Navigate to="/signin" replace state={{ from: location.pathname }} />;
+  if (!user) return <Navigate to="/signin" replace state={{ from: location.pathname + location.search }} />;
   return children;
 }
 

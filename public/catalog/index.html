@@ -16,9 +16,6 @@
   <meta name="theme-color" content="#f7f8f7">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/catalog/catalog.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Curated attractions | TravelM</title>
   <script type="module" src="/catalog/catalog-app.mjs"></script>
 </head>
@@ -36,17 +33,16 @@
     <div class="intro">
       <div>
         <p class="eyebrow">EXPLORE NORTHERN THAILAND</p>
-        <h1>Discover places</h1>
+        <h1>Find your kind of somewhere.</h1>
         <p class="subtitle">Temples in the hills, quiet waterfalls and local markets. Find your kind of adventure in Chiang Mai and Chiang Rai.</p>
       </div>
       <div class="catalog-counter" aria-label="Catalog size"><strong>200</strong><span>attractions</span><small>100 in each province</small></div>
     </div>
-    <div class="disclosure" role="note">
-      <span aria-hidden="true">ⓘ</span>
-      <span>Locations are from OpenStreetMap, extracted on <strong>16 Oct 2026</strong>. These are short-listed map records, <strong>not independently verified</strong>. Confirm access, opening hours and fees before visiting.</span>
-    </div>
+    <details class="disclosure"><summary>Before you go: check opening hours, access and fees</summary>
+      <p>Locations are from OpenStreetMap, extracted on <strong>16 Oct 2026</strong>. These are short-listed map records, <strong>not independently verified</strong>. Confirm access, opening hours and fees before visiting.</p>
+    </details>
     <section class="toolbar" aria-label="Search and filters">
-      <label class="search"><span>Search places</span><input id="query" type="search" placeholder="Search temples, waterfalls, museums…" autocomplete="off"></label>
+      <label class="search"><span>Search places</span><input id="query" type="search" placeholder="Search temples, waterfalls, markets…" autocomplete="off"></label>
       <label><span>Province</span><select id="province"><option value="All">Both provinces</option><option value="Chiang Mai Province">Chiang Mai</option><option value="Chiang Rai Province">Chiang Rai</option></select></label>
       <label><span>Category</span><select id="category"><option value="All">All categories</option><option value="Culture">Culture</option><option value="Nature">Nature</option><option value="Food">Food & markets</option></select></label>
       <div class="view-switch" role="group" aria-label="Display mode"><button id="list-mode" type="button" class="active" aria-pressed="true">Browse</button><button id="map-mode" type="button" aria-pressed="false">Map</button></div>

@@ -98,3 +98,18 @@ test('favicon serves as SVG, not the HTML shell', async () => {
   assert.match(res.headers.get('content-type'), /image\/svg\+xml/);
   assert.match(await res.text(), /<svg/);
 });
+
+test('embedded Discover permits same-origin framing and keeps its module executable', async () => {
+  const catalog = await fetch(base + '/catalog/index.html?embedded=1');
+  assert.equal(catalog.status, 200);
+  assert.equal(catalog.headers.get('x-frame-options'), 'SAMEORIGIN');
+  assert.match(await catalog.text(), /catalog-app\.mjs/);
+  const cached = await fetch(base + '/catalog/index.html', { headers: { 'If-None-Match': catalog.headers.get('etag') } });
+  assert.equal(cached.status, 304);
+  assert.equal(cached.headers.get('x-frame-options'), 'SAMEORIGIN');
+  const module = await fetch(base + '/catalog/catalog-navigation.mjs');
+  assert.equal(module.status, 200);
+  assert.match(module.headers.get('content-type'), /javascript/);
+  assert.equal(module.headers.get('x-frame-options'), 'DENY');
+  assert.match(await module.text(), /filtersFromSearch/);
+});

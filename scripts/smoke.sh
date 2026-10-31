@@ -38,8 +38,8 @@ case "$shell" in
   *) printf '  note shell copy not matched (fine for a minified shell)\n' ;;
 esac
 case "$shell" in
-  *'leaflet@1.9.4'*) ok "Leaflet pinned CDN link present" ;;
-  *) bad "Leaflet CDN link missing from index.html" ;;
+  *'leaflet@1.9.4'*) bad "Legacy Leaflet CDN link remains in index.html" ;;
+  *) ok "No legacy Leaflet CDN link" ;;
 esac
 case "$shell" in
   *fonts.googleapis.com*Inter*) ok "Inter webfont link present" ;;

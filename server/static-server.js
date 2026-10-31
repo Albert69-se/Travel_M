@@ -80,6 +80,8 @@ function serveFile(req, res, filePath, stat, cacheControl) {
   const etag = `W/"${stat.size.toString(16)}-${Math.trunc(stat.mtimeMs).toString(16)}"`;
   const headers = {
     'Content-Type': contentType(filePath),
+    // Only the maintained catalog is embedded by our same-origin React shell.
+    'X-Frame-Options': filePath === join(root, 'catalog', 'index.html') ? 'SAMEORIGIN' : 'DENY',
     'Cache-Control': cacheControl,
     ETag: etag,
     'Last-Modified': stat.mtime.toUTCString(),

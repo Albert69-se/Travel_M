@@ -60,3 +60,10 @@ Baseline committed before any redesign edits. Preview available at http://127.0.
 The pre-overhaul checkpoint is `45e9d61`. The implementation is committed separately with subject
 `feat: overhaul TravelM workspace and planning UX`. Revert that implementation commit to restore
 the checkpoint while keeping Git history. No production deployment or remote push was made.
+
+## VPS deployment follow-up
+User requested deployment after the UI commit. Verified `edux-oracle-vps` resolves to the existing Tailscale host and `travel-m-react.service` serves `/home/opc/apps/travel-m-react/dist` on port 8802; the tunnel is active.
+
+Preflight found the server sends `X-Frame-Options: DENY` for the catalog, blocking the existing embedded architecture. Added a SAMEORIGIN exception for only `catalog/index.html`; other routes remain DENY. Regression coverage checks normal/cached catalog responses and executable module MIME. Updated the obsolete smoke assertion that still required Leaflet.
+
+Keep the existing hosted school-evaluation deployment mode; do not change map keys or billing. Snapshot assets/server, deploy the committed build, restart only TravelM, verify artifact hashes, local and public routes, catalog framing and module responses. Browser interaction remains unavailable in Work settings.

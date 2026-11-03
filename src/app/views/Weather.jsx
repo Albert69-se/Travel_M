@@ -126,7 +126,7 @@ export default function WeatherView() {
 
       <div className="flex flex-col gap-4" aria-live="polite">
         {result.status === 'loading' ? (
-          <Card>
+          <Card data-fr="FR-4">
             <p className="text-body text-ink-secondary" role="status">
               Requesting the forecast…
             </p>
@@ -135,7 +135,7 @@ export default function WeatherView() {
 
         {result.status === 'ok' ? (
           <>
-            <Card className="flex flex-col gap-3">
+            <Card data-fr="FR-4" className="flex flex-col gap-3">
               <CardHeader
                 title="Current conditions"
                 meta={`Retrieved ${retrievedLabel(result.retrievedAt)} · weather now, not a forecast for your trip dates`}
@@ -174,7 +174,7 @@ export default function WeatherView() {
                 {result.note}
               </Notice>
             ) : (
-              <Card padded={false}>
+              <Card data-fr="FR-4" padded={false}>
                 <div className="p-4">
                   <CardHeader
                     title="Daily forecast"

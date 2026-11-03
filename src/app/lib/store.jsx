@@ -192,6 +192,8 @@ export function DataProvider({ children }) {
     (tripId, input) => {
       const result = tripsApi.updateTrip(storage.readList(KEYS.trips), tripId, input, user ? user.id : null);
       if (!result.ok) return result;
+      const dateError = tripsApi.validateTripDatesAgainstActivities(tripId, input, storage.readList(KEYS.itinerary));
+      if (dateError) return { ok: false, errors: { form: dateError } };
       storage.writeList(KEYS.trips, result.trips);
       refresh();
       setStatus('Trip updated.', 'success');
@@ -308,6 +310,14 @@ export function DataProvider({ children }) {
     [refresh],
   );
 
+  const movePackingItem = useCallback((tripId, itemId, direction) => {
+    const trip = tripsApi.getTripById(storage.readList(KEYS.trips), tripId);
+    if (!user || !trip || trip.userId !== user.id) return { ok: false };
+    storage.writeList(KEYS.packing, packingApi.movePackingItem(storage.readList(KEYS.packing), tripId, itemId, direction));
+    refresh();
+    return { ok: true };
+  }, [refresh, user]);
+
   const suggestPackingItems = useCallback(
     (tripId) => {
       storage.writeList(KEYS.packing, packingApi.suggestPackingItems(storage.readList(KEYS.packing), tripId));
@@ -407,6 +417,7 @@ export function DataProvider({ children }) {
       togglePackingItem,
       renamePackingItem,
       deletePackingItem,
+      movePackingItem,
       suggestPackingItems,
       addExpense,
       updateExpense,
@@ -417,7 +428,7 @@ export function DataProvider({ children }) {
       ready, status, setStatus, user, data, places, placeImport, ensureGooglePlace, retryPlaceImport, signIn, signInAsDemo, register, signOut, isPlaceSaved,
       toggleSavedPlace, createTrip, updateTrip, deleteTrip, addActivity, updateActivity,
       deleteActivity, moveActivity, addPackingItem, togglePackingItem, renamePackingItem,
-      deletePackingItem, suggestPackingItems, addExpense, updateExpense, deleteExpense, resetData,
+      deletePackingItem, movePackingItem, suggestPackingItems, addExpense, updateExpense, deleteExpense, resetData,
     ],
   );
 

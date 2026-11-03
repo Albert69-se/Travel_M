@@ -394,7 +394,7 @@ function Dashboard({ user }) {
         </Card>
       ) : (
         <>
-          <Card padded={false} className="tm-current-trip overflow-hidden">
+          <Card data-fr="FR-5 · FR-6 · FR-7 · FR-8 · FR-10" padded={false} className="tm-current-trip overflow-hidden">
             <div className="grid gap-6 p-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -510,7 +510,7 @@ function GuestHome() {
         <p className="tm-eyebrow">Thailand, at your own pace</p>
         <h1>A place to go.<br /><em>A plan to make.</em></h1>
         <p>Find the quiet corners and the can't-miss stops. Bring them together in a trip that feels like yours.</p>
-        <form className="tm-home-search" onSubmit={event => { event.preventDefault(); navigate(`/discover${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`); }} role="search">
+        <form data-fr="FR-2" className="tm-home-search" onSubmit={event => { event.preventDefault(); navigate(`/discover${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`); }} role="search">
           <label className="sr-only" htmlFor="home-search">Search places in northern Thailand</label>
           <Search size={20} aria-hidden="true" />
           <input id="home-search" type="search" placeholder="Temples, waterfalls, markets…" value={query} onChange={event => setQuery(event.target.value)} />
@@ -529,13 +529,13 @@ function GuestHome() {
     </section>
     <section aria-labelledby="regions-heading">
       <div className="tm-section-heading"><div><p className="tm-eyebrow">Two ways north</p><h2 id="regions-heading">Where will you wander?</h2></div><Link to="/discover" className="tm-text-link tm-focus">Explore all places <ArrowRight size={16} aria-hidden="true" /></Link></div>
-      <div className="tm-region-grid">
+      <div data-fr="FR-1 · FR-2" className="tm-region-grid">
         {[{ name: 'Chiang Mai', tagline: 'Mountain air. Old-town mornings.', text: 'Temples, forest trails and markets worth lingering in.', icon: Compass }, { name: 'Chiang Rai', tagline: 'Take the slower road north.', text: 'Art, hill-country scenery and a change of pace.', icon: MapPin }].map((region, i) => <Link key={region.name} to={`/discover?province=${encodeURIComponent(region.name + ' Province')}`} className={`tm-region-card tm-focus tm-region-${i}`}><div className="tm-region-top"><region.icon size={27} strokeWidth={1.2} aria-hidden="true" /><span>NORTHERN THAILAND / 0{i + 1}</span><ArrowUpRight size={21} aria-hidden="true" /></div><h3>{region.name}</h3><p className="tm-region-tagline">{region.tagline}</p><p>{region.text}</p></Link>)}
       </div>
     </section>
     <section aria-labelledby="featured-heading">
       <div className="tm-section-heading"><div><p className="tm-eyebrow">A starting point</p><h2 id="featured-heading">Make room for discovery</h2></div><span className="text-label text-ink-secondary">Sample places · details unverified</span></div>
-      <div className="tm-feature-grid">{featured.map(place => <article className="tm-feature-card" key={place.id}><PlacePhoto place={place} hero className="tm-feature-photo" /><div className="tm-feature-copy"><span className="tm-eyebrow">{place.category}</span><h3><Link to={`/discover/${place.id}`} className="tm-focus">{place.name} <ArrowUpRight size={17} aria-hidden="true" /></Link></h3><p>{place.locality}</p><GoogleAttribution place={place} /></div></article>)}</div>
+      <div data-fr="FR-1 · FR-3" className="tm-feature-grid">{featured.map(place => <article className="tm-feature-card" key={place.id}><PlacePhoto place={place} hero className="tm-feature-photo" /><div className="tm-feature-copy"><span className="tm-eyebrow">{place.category}</span><h3><Link to={`/discover/${place.id}`} className="tm-focus">{place.name} <ArrowUpRight size={17} aria-hidden="true" /></Link></h3><p>{place.locality}</p><GoogleAttribution place={place} /></div></article>)}</div>
     </section>
     <section className="tm-demo-strip"><div><p className="tm-eyebrow">Take it for a spin</p><h2>A weekend in Chiang Mai. Already planned.</h2><p>Explore a sample itinerary, packing list and budget. Changes stay in this browser.</p>{demoError && <p role="alert" className="text-danger">{demoError}</p>}</div><button type="button" className="tm-action tm-action-primary" disabled={demoBusy} onClick={tryDemo}>{demoBusy ? 'Opening demo…' : 'Try the demo'}<ArrowRight size={17} aria-hidden="true" /></button></section>
   </div>;

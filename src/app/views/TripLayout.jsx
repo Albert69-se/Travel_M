@@ -185,7 +185,7 @@ export default function TripLayout() {
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="flex flex-wrap items-start justify-between gap-3">
+      <header data-fr="FR-5 · FR-6" className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-label text-ink-tertiary">
             <Link to="/trips" className="tm-focus rounded-[4px] hover:text-ink">
@@ -243,7 +243,7 @@ export default function TripLayout() {
       ) : null}
 
       {editing ? (
-        <Card>
+        <Card data-fr="FR-5 · FR-6">
           <CardHeader title="Edit trip" meta="Update your destination, dates or budget." />
           <Divider className="my-3" />
           <TripForm

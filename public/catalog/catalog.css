@@ -155,3 +155,5 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .panel-open .details { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 420px) { .places { grid-template-columns: 1fr; } }
+html.fr-debug [data-fr] { outline: 1px solid #d63838; outline-offset: -1px; position: relative; padding-top: max(22px, 1rem); }
+html.fr-debug [data-fr]::before { content: attr(data-fr); position: absolute; top: 0; right: 0; z-index: 5; background: #b92323; color: white; padding: 2px 5px; border-radius: 0 0 0 4px; font: 600 10px/1.3 system-ui, sans-serif; pointer-events: none; }

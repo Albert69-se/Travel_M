@@ -221,6 +221,23 @@ button, a, input, select { touch-action: manipulation; }
 .tm-main h1 { overflow-wrap: anywhere; }
 .tm-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin: 0 40px; padding: 22px 0; border-top: 1px solid var(--color-line); color: var(--color-ink-secondary); font-size: 12px; }
 .tm-footer > span:first-child { font-family: Georgia, serif; font-size: 16px; font-style: italic; }
+.tm-fr-toggle { border: 1px solid var(--color-line); border-radius: 8px; background: transparent; color: var(--color-ink-secondary); padding: 8px 12px; font-size: 12px; cursor: pointer; }
+.tm-fr-toggle:hover, .tm-fr-toggle[aria-pressed="true"] { color: var(--color-accent); border-color: var(--color-accent); }
+.tm-fr-guide { margin-bottom: 24px; padding: 20px; border: 1px solid #80a89f; border-radius: 16px; background: #f1f8f5; color: #163a34; }
+.tm-fr-guide-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+.tm-fr-guide-header h2 { margin: 3px 0 4px; font-size: 20px; font-weight: 700; }
+.tm-fr-guide-header p, .tm-fr-guide > p { font-size: 13px; line-height: 1.5; }
+.tm-fr-guide-kicker { font-weight: 700; letter-spacing: .07em; }
+.tm-fr-guide-close { align-self: flex-start; border: 1px solid #80a89f; border-radius: 8px; background: white; padding: 8px 12px; cursor: pointer; }
+.tm-fr-guide-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px; margin-top: 15px; }
+.tm-fr-guide-card { min-width: 0; padding: 13px; border: 1px solid #d2e4dc; border-radius: 10px; background: white; }
+.tm-fr-guide-card h3 { font-size: 14px; font-weight: 700; }
+.tm-fr-guide-card h3 span { color: #156552; }
+.tm-fr-guide-card p { margin-top: 6px; font-size: 13px; line-height: 1.45; }
+.tm-fr-guide-note, .tm-fr-guide-footnote { color: #49675f; }
+.tm-fr-guide-footnote { margin-top: 12px; }
+.tm-fr-debug [data-fr] { outline: 1px solid #d63838; outline-offset: -1px; position: relative; padding-top: max(22px, 1rem); }
+.tm-fr-debug [data-fr]::before { content: attr(data-fr); position: absolute; top: 0; right: 0; z-index: 5; background: #b92323; color: white; padding: 2px 5px; border-radius: 0 0 0 4px; font: 600 10px/1.3 system-ui, sans-serif; pointer-events: none; }
 .tm-mobile-header, .tm-bottom-nav { display: none; }
 .tm-skip { position: fixed; top: 12px; left: 12px; z-index: 2000; background: white; padding: 12px 20px; transform: translateY(-150%); }
 .tm-skip:focus { transform: none; }

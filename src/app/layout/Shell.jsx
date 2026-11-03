@@ -1,9 +1,10 @@
 /** Shared navigation and route focus for the TravelM workspace. */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import { ArrowUpRight, CalendarDays, Compass, Home, LogIn, LogOut, MapPin, Plus, User } from 'lucide-react';
 import { useData } from '../lib/store.jsx';
 import { useFocusTrip } from '../lib/hooks.js';
+import RequirementGuide from '../components/RequirementGuide.jsx';
 
 const PRIMARY = [
   { to: '/', label: 'Home', icon: Home, end: true },
@@ -32,6 +33,7 @@ function StatusToast() {
   return status ? <div role="status" aria-live="polite" className={`tm-toast tm-toast-${status.tone || 'info'}`}>{status.message}</div> : null;
 }
 export default function Shell() {
+  const [showRequirements, setShowRequirements] = useState(false);
   const { user, signOut, ready } = useData();
   const focusTrip = useFocusTrip();
   const navigate = useNavigate();
@@ -65,8 +67,8 @@ export default function Shell() {
     <header className="tm-mobile-header"><Brand /><Link className="tm-focus tm-mobile-account" to={user ? '/account' : '/signin'}>{user ? <><span className="tm-avatar">{initialsOf(user.name)}</span><span className="sr-only">Account</span></> : 'Sign in'}</Link></header>
     <div className="tm-shell-content">
       <header className="tm-shell-top"><div><span>YOUR TRAVEL NOTEBOOK</span><strong>{section}</strong></div><Link to="/trips?new=1" className="tm-action tm-action-primary"><Plus size={16} aria-hidden="true" /> Plan a trip</Link></header>
-      <main id="view" tabIndex={-1} className="tm-main">{ready ? <Outlet /> : <p role="status" className="text-ink-secondary">Preparing your workspace…</p>}</main>
-      <footer className="tm-footer"><span>Leave room for a little discovery.</span><span>Local prototype · destination details unverified</span></footer>
+      <main id="view" tabIndex={-1} className={`tm-main${showRequirements ? ' tm-fr-debug' : ''}`}>{showRequirements && <RequirementGuide pathname={pathname} onClose={() => setShowRequirements(false)} />}{ready ? <Outlet context={{ showRequirements }} /> : <p role="status" className="text-ink-secondary">Preparing your workspace…</p>}</main>
+      <footer className="tm-footer"><span>Leave room for a little discovery.</span><span>Local prototype · destination details unverified</span><button type="button" className="tm-fr-toggle tm-focus" aria-pressed={showRequirements} onClick={() => setShowRequirements(value => !value)}>{showRequirements ? 'Debug mode on' : 'Show FR debug mode'}</button></footer>
     </div>
     <nav aria-label="Main" className="tm-bottom-nav">{[...PRIMARY.map(item => ({ ...item, label: item.to === '/saved' ? 'Saved' : item.to === '/trips' ? 'Trips' : item.label })), { to: user ? '/account' : '/signin', label: user ? 'Account' : 'Sign in', icon: User }].map(({ icon: Icon, ...item }) => <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `tm-focus${isActive ? ' is-active' : ''}`}><Icon size={20} strokeWidth={1.7} aria-hidden="true" /><span>{item.label}</span></NavLink>)}</nav>
     <StatusToast />

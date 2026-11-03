@@ -144,7 +144,7 @@ export default function ExpensesView() {
       {budgetWarning}
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <Card padded={false} className="overflow-hidden">
+        <Card data-fr="FR-9" padded={false} className="overflow-hidden">
           <div className="p-4">
             <CardHeader
               title="Expense records"
@@ -249,7 +249,7 @@ export default function ExpensesView() {
         </Card>
 
         <div className="flex flex-col gap-4">
-          <Card className="flex flex-col gap-3">
+          <Card data-fr="FR-10" className="flex flex-col gap-3">
             <CardHeader
               title="By category"
               meta={
@@ -291,7 +291,7 @@ export default function ExpensesView() {
             )}
           </Card>
 
-          <Card className="flex flex-col gap-3">
+          <Card data-fr="FR-9" className="flex flex-col gap-3">
             <CardHeader
               title={editingId ? 'Edit expense' : 'Add expense'}
               meta={editingId ? 'Saving replaces the stored record.' : 'Recorded against this trip only.'}

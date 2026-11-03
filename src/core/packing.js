@@ -32,6 +32,18 @@ export function deletePackingItem(packing, itemId) {
   return packing.filter((item) => item.id !== itemId);
 }
 
+/** Move an item within its own trip without disturbing other trips' slots. */
+export function movePackingItem(packing, tripId, itemId, direction) {
+  if (!Array.isArray(packing) || !['up', 'down'].includes(direction)) return packing;
+  const indices = packing.map((item, index) => item.tripId === tripId ? index : -1).filter((index) => index !== -1);
+  const position = indices.findIndex((index) => packing[index].id === itemId);
+  const next = position + (direction === 'up' ? -1 : 1);
+  if (position < 0 || next < 0 || next >= indices.length) return packing;
+  const result = [...packing];
+  [result[indices[position]], result[indices[next]]] = [result[indices[next]], result[indices[position]]];
+  return result;
+}
+
 /** Only this trip's items; items from another trip must never appear. */
 export function listByTrip(packing, tripId) {
   if (!Array.isArray(packing)) return [];

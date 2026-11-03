@@ -250,7 +250,7 @@ export default function TripsView() {
       ) : null}
 
       {showForm ? (
-        <Card>
+        <Card data-fr="FR-5 · FR-6">
           <CardHeader title="New trip" meta="Pick a destination and dates. The details can come later." />
           <Divider className="my-3" />
           <TripForm
@@ -265,7 +265,7 @@ export default function TripsView() {
         <ul className="tm-trips-grid">
           {ordered.map((trip) => (
             <li key={trip.id}>
-              <Card className="tm-trip-card flex flex-wrap items-start justify-between gap-3">
+              <Card data-fr="FR-5 · FR-6" className="tm-trip-card flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link

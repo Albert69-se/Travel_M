@@ -62,7 +62,7 @@ export default function TripOverviewView() {
   return (
     <div className="flex flex-col gap-4">
       {/* Hero: where this trip is, and what it costs. */}
-      <Card className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+      <Card data-fr="FR-5 · FR-6 · FR-10" className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-2">
           <FinePrint>Destination</FinePrint>
           <h2 className="text-section font-semibold text-ink break-words">{trip.destinationLabel}</h2>
@@ -130,7 +130,7 @@ export default function TripOverviewView() {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         {/* Left: what happens next. */}
-        <Card padded={false}>
+        <Card data-fr="FR-7" padded={false}>
           <div className="p-4">
             <CardHeader
               title="Upcoming plan"

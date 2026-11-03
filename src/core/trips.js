@@ -88,6 +88,7 @@ export function updateTrip(trips, tripId, input, userId, now = new Date().toISOS
       ...trip,
       name: values.name,
       destinationLabel: values.destination,
+      destinationId: values.destination === trip.destinationLabel ? trip.destinationId : null,
       startDate: values.startDate,
       endDate: values.endDate,
       expectedBudget: values.expectedBudget,
@@ -96,6 +97,16 @@ export function updateTrip(trips, tripId, input, userId, now = new Date().toISOS
   });
 
   return { ok: true, trips: next };
+}
+
+/** Prevent a date edit from hiding existing itinerary activities. */
+export function validateTripDatesAgainstActivities(tripId, input, itinerary) {
+  const { valid, values } = validateTrip(input);
+  if (!valid) return null; // The main validator will report the field errors.
+  const outside = (Array.isArray(itinerary) ? itinerary : []).some(
+    (item) => item.tripId === tripId && (item.date < values.startDate || item.date > values.endDate),
+  );
+  return outside ? 'Move or remove activities outside the new dates before changing this trip.' : null;
 }
 
 export function getTripsForUser(trips, userId) {

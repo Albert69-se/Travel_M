@@ -7,7 +7,7 @@
  */
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Backpack, Check, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Backpack, Check, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react';
 
 import {
   Button,
@@ -26,7 +26,7 @@ import {
 import { useData } from '../lib/store.jsx';
 import { describeSuggestionSource } from '../../core/packing.js';
 
-function PackingRow({ item, onToggle, onRename, onDelete }) {
+function PackingRow({ item, onToggle, onRename, onDelete, onMove, first, last }) {
   const [renaming, setRenaming] = useState(false);
   const [draft, setDraft] = useState(item.name);
   const [confirming, setConfirming] = useState(false);
@@ -76,6 +76,8 @@ function PackingRow({ item, onToggle, onRename, onDelete }) {
         )}
       </div>
       <div className="flex shrink-0 items-center gap-0.5">
+        <IconButton icon={ArrowUp} label={`Move ${item.name} up`} disabled={first} onClick={() => onMove(item.id, 'up')} />
+        <IconButton icon={ArrowDown} label={`Move ${item.name} down`} disabled={last} onClick={() => onMove(item.id, 'down')} />
         {renaming ? (
           <Button size="sm" variant="secondary" icon={Check} onClick={commitRename}>
             Save
@@ -109,13 +111,12 @@ function PackingRow({ item, onToggle, onRename, onDelete }) {
 
 export default function PackingView() {
   const { trip, packing, packingCounts } = useOutletContext();
-  const { addPackingItem, togglePackingItem, renamePackingItem, deletePackingItem, suggestPackingItems } = useData();
+  const { addPackingItem, togglePackingItem, renamePackingItem, deletePackingItem, movePackingItem, suggestPackingItems } = useData();
 
   const [newName, setNewName] = useState('');
   const [nameError, setNameError] = useState('');
 
-  // Unpacked items first; equal keys keep the stored order.
-  const ordered = [...packing].sort((a, b) => Number(a.isPacked === true) - Number(b.isPacked === true));
+  const ordered = packing;
   const complete = packingCounts.total > 0 && packingCounts.packed === packingCounts.total;
 
   const handleAdd = (event) => {
@@ -151,7 +152,7 @@ export default function PackingView() {
       />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <Card padded={false} className="overflow-hidden">
+        <Card data-fr="FR-8" padded={false} className="overflow-hidden">
           <div className="p-4">
             <CardHeader
               title="Checklist"
@@ -174,13 +175,16 @@ export default function PackingView() {
             />
           ) : (
             <div className="tm-scroll max-h-[560px] overflow-y-auto">
-              {ordered.map((item) => (
+              {ordered.map((item, index) => (
                 <PackingRow
                   key={item.id}
                   item={item}
                   onToggle={togglePackingItem}
                   onRename={renamePackingItem}
                   onDelete={deletePackingItem}
+                  onMove={(itemId, direction) => movePackingItem(trip.id, itemId, direction)}
+                  first={index === 0}
+                  last={index === ordered.length - 1}
                 />
               ))}
             </div>
@@ -220,7 +224,7 @@ export default function PackingView() {
           </form>
         </Card>
 
-        <Card className="flex flex-col gap-3">
+        <Card data-fr="FR-8" className="flex flex-col gap-3">
           <CardHeader title="At a glance" meta={`Progress for ${trip.name}`} />
           <div className="flex flex-col">
             <KeyValue label="Packed">{`${packingCounts.packed} of ${packingCounts.total}`}</KeyValue>

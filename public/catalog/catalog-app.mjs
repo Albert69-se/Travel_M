@@ -232,7 +232,12 @@ function setView(view) {
   $('map-mode').classList.remove('active'); $('map-mode').setAttribute('aria-pressed', 'false');
 }
 window.addEventListener('message', event => {
-  if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'travelm:map-config') return;
+  if (event.origin !== location.origin || event.source !== parent) return;
+  if (event.data?.type === 'travelm:fr-debug') {
+    document.documentElement.classList.toggle('fr-debug', event.data.enabled === true);
+    return;
+  }
+  if (event.data?.type !== 'travelm:map-config') return;
   state.mapKey = typeof event.data.key === 'string' ? event.data.key : '';
   if (state.selectedId || state.view === 'map') showGoogleMap(byId(state.selectedId));
 });

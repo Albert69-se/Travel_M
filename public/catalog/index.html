@@ -41,7 +41,7 @@
     <details class="disclosure"><summary>Before you go: check opening hours, access and fees</summary>
       <p>Locations are from OpenStreetMap, extracted on <strong>16 Oct 2026</strong>. These are short-listed map records, <strong>not independently verified</strong>. Confirm access, opening hours and fees before visiting.</p>
     </details>
-    <section class="toolbar" aria-label="Search and filters">
+    <section class="toolbar" aria-label="Search and filters" data-fr="FR-2">
       <label class="search"><span>Search places</span><input id="query" type="search" placeholder="Search temples, waterfalls, markets…" autocomplete="off"></label>
       <label><span>Province</span><select id="province"><option value="All">Both provinces</option><option value="Chiang Mai Province">Chiang Mai</option><option value="Chiang Rai Province">Chiang Rai</option></select></label>
       <label><span>Category</span><select id="category"><option value="All">All categories</option><option value="Culture">Culture</option><option value="Nature">Nature</option><option value="Food">Food & markets</option></select></label>
@@ -50,13 +50,13 @@
     <button id="clear-filters" class="reset-filters" type="button" hidden>Clear filters</button>
     <div id="status" class="status" role="status" aria-live="polite">Loading local catalog…</div>
     <div class="content-layout">
-      <section class="listing" aria-label="Matching attractions">
+      <section class="listing" aria-label="Matching attractions" data-fr="FR-1 · FR-2">
         <div class="section-heading"><strong id="result-count">Attractions</strong><span id="category-hint">All places</span></div>
         <div id="items" class="places" aria-live="off"></div>
         <button id="show-more" type="button" class="show-more" hidden>Show more places</button>
         <p id="empty" class="empty" hidden>No attractions match. Try different keywords or filters.</p>
       </section>
-      <aside class="detail-column" aria-label="Attraction details" hidden>
+      <aside class="detail-column" aria-label="Attraction details" data-fr="FR-1 · FR-3 · FR-7" hidden>
         <button id="back-results" class="btn back-results" type="button">← Back to browsing</button>
         <div id="map-wrapper" hidden><div class="map-types" role="group" aria-label="Map style"><button id="roadmap-type" type="button" aria-pressed="true">Map</button><button id="satellite-type" type="button" aria-pressed="false">Satellite</button></div><div id="map" role="region" aria-label="Google map of attractions"></div><p id="map-caption" class="map-caption">Select a marker for details.</p></div>
         <div id="details" class="details">

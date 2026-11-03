@@ -300,11 +300,11 @@ export default function PlaceDetailView() {
         <div className="flex flex-col gap-4">
           <PlaceHero place={place} />
 
-          <Card>
+          <Card data-fr="FR-3">
             <p className="text-body leading-relaxed text-ink-secondary">{place.description}</p>
           </Card>
 
-          <Card padded={false} className="px-4 py-2">
+          <Card data-fr="FR-3" padded={false} className="px-4 py-2">
             <KeyValue label="Estimated cost">
               <span className="block">{money(place.estimatedCost)}</span>
               {place.estimatedCostNote ? (
@@ -317,7 +317,7 @@ export default function PlaceDetailView() {
             <KeyValue label="Coordinates">{formatCoordinates(place.latitude, place.longitude)}</KeyValue>
           </Card>
 
-          <div className="flex flex-col gap-1.5">
+          <div data-fr="FR-3" className="flex flex-col gap-1.5">
             <Notice tone="warning" icon={ShieldAlert}>
               <p className="text-body font-medium text-ink">Provenance</p>
               <dl className="mt-1.5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5">
@@ -376,7 +376,7 @@ export default function PlaceDetailView() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
+          <div data-fr="FR-3" className="flex flex-col gap-2">
             <MapPanel
               places={[place]}
               subject="place"
@@ -396,7 +396,7 @@ export default function PlaceDetailView() {
             </div>
           </div>
 
-          <Card>
+          <Card data-fr="FR-4">
             <CardHeader
               title="Current conditions"
               meta={weather.status === 'ok' ? weather.provider : 'No forecast requested for dates'}

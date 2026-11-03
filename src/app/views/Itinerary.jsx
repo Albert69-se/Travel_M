@@ -180,7 +180,7 @@ export default function ItineraryView() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-            <Card padded={false} className="overflow-hidden">
+            <Card data-fr="FR-7" padded={false} className="overflow-hidden">
               <div className="p-4">
                 <CardHeader
                   title={weekdayDate(activeDate)}
@@ -255,7 +255,7 @@ export default function ItineraryView() {
             </Card>
 
             <div className="flex flex-col gap-4">
-              <Card className="flex flex-col gap-3">
+              <Card data-fr="FR-7" className="flex flex-col gap-3">
                 <CardHeader
                   title={editingId ? 'Edit activity' : 'Add an activity'}
                   meta={editingId ? 'Saving replaces the stored record.' : 'One date per activity.'}

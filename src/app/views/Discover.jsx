@@ -1,11 +1,12 @@
 /** The maintained catalog shares the app shell and its existing account storage. */
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 
 export default function DiscoverView() {
   const frame = useRef(null);
   const panelPosition = useRef(null);
   const { search } = useLocation();
+  const { showRequirements = false } = useOutletContext() || {};
   const [height, setHeight] = useState(900);
   const [panelOpen, setPanelOpen] = useState(false);
   useEffect(() => {
@@ -28,11 +29,15 @@ export default function DiscoverView() {
     window.addEventListener('message', resize);
     return () => window.removeEventListener('message', resize);
   }, []);
+  useEffect(() => {
+    frame.current?.contentWindow?.postMessage({ type: 'travelm:fr-debug', enabled: showRequirements }, location.origin);
+  }, [showRequirements]);
   const params = new URLSearchParams(search);
   params.set('embedded', '1');
-  const sendMapKey = () => frame.current?.contentWindow?.postMessage({
-    type: 'travelm:map-config', key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_DEMO_KEY || '',
-  }, location.origin);
+  const sendMapKey = () => {
+    frame.current?.contentWindow?.postMessage({ type: 'travelm:map-config', key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_DEMO_KEY || '' }, location.origin);
+    frame.current?.contentWindow?.postMessage({ type: 'travelm:fr-debug', enabled: showRequirements }, location.origin);
+  };
   return <div style={{ height }}><iframe ref={frame} title="Discover places" className={`tm-discover-frame${panelOpen ? ' tm-discover-frame-panel' : ''}`}
     src={`/catalog/index.html?${params}`} style={{ height: panelOpen ? undefined : height }} onLoad={sendMapKey} /></div>;
 }

@@ -206,6 +206,18 @@ test('updating a trip keeps the same record and refreshes updatedAt', () => {
   assert.equal(result.trips[0].expectedBudget, 250);
 });
 
+test('trip edits protect dated activities and clear a changed destination reference', () => {
+  const trip = { ...TRIP, destinationId: 'google-original' };
+  const input = { name: trip.name, destination: 'Bangkok', startDate: '2026-11-13', endDate: '2026-11-15', budget: '5000' };
+  const activities = [{ tripId: trip.id, date: '2026-11-12' }, { tripId: 'other', date: '2020-01-01' }];
+  assert.match(tripsApi.validateTripDatesAgainstActivities(trip.id, input, activities), /Move or remove/);
+  assert.equal(tripsApi.validateTripDatesAgainstActivities(trip.id, { ...input, startDate: '2026-11-12' }, activities), null);
+  const result = tripsApi.updateTrip([trip], trip.id, input, trip.userId);
+  assert.equal(result.trips[0].destinationId, null);
+  const unchanged = tripsApi.updateTrip([trip], trip.id, { ...input, destination: trip.destinationLabel }, trip.userId);
+  assert.equal(unchanged.trips[0].destinationId, 'google-original');
+});
+
 test('deleting a trip removes its itinerary, packing, and expense records', () => {
   const data = {
     trips: [TRIP, { ...TRIP, id: 'trip-2' }],
@@ -283,6 +295,19 @@ test('one trip never sees another trip packing items', () => {
   packing = packingApi.addPackingItem(packing, 'trip-2', 'Towel').packing;
   assert.deepEqual(packingApi.listByTrip(packing, 'trip-1').map((item) => item.name), ['Passport']);
   assert.deepEqual(packingApi.listByTrip(packing, 'trip-2').map((item) => item.name), ['Towel']);
+});
+
+test('packing reorder stays within a trip and preserves item state', () => {
+  const packing = [
+    { id: 'a', tripId: 'one', name: 'A', isPacked: true },
+    { id: 'x', tripId: 'two', name: 'X', isPacked: false },
+    { id: 'b', tripId: 'one', name: 'B', isPacked: false },
+  ];
+  const moved = packingApi.movePackingItem(packing, 'one', 'b', 'up');
+  assert.deepEqual(moved.map((item) => item.id), ['b', 'x', 'a']);
+  assert.equal(moved[2].isPacked, true);
+  assert.deepEqual(packingApi.movePackingItem(moved, 'one', 'b', 'up'), moved);
+  assert.deepEqual(packingApi.movePackingItem(moved, 'one', 'x', 'down'), moved);
 });
 
 test('suggestions are skipped when the item already exists', () => {

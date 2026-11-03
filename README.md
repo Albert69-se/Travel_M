@@ -1,14 +1,17 @@
 # Travel M — React build
 
 A trip planner: browse places, save them, plan trips day by day, keep a packing
-list, track a budget and read a forecast. This is the **React** build of the
-prototype that lives in [`Travel_M`](../Travel_M).
+list, track a budget and read a forecast. This is Team Apollo's React project.
 
 Live: <https://travel-m.xcalibur.space>
 
+**New to the project?** Follow the [Mac and Windows setup and contribution guide](docs/TEAM_GITHUB_GUIDE.md) for access, cloning, local development, testing, commits and pull requests.
+
+Team members can find proposed responsibilities and the evidence log in [Team contributions](Team_contribution.md).
+
 ## Current source changes — 26 October 2026
 
-Source: https://github.com/Albert69-se/Travel_M_React (student account; separate from the legacy Travel_M repository).
+Source: https://github.com/Albert69-se/Travel_M (student account; React repository renamed on 3 November 2026).
 
 - Redesigned warm-neutral/teal shell, illustrated home page, larger controls and responsive Discover workspace.
 - Country maps show numbered regional groups. Selecting a group zooms in; **Show on map** focuses a card; **All results** restores the result bounds. These controls use Google Maps.
@@ -329,3 +332,15 @@ Playwright.
 The SRS requires AI assistance to be logged and reviewed, and every requirement to
 be explainable in the oral exam. This build reuses the same reviewed logic modules
 as the prototype; the new material is the presentation layer.
+
+For the current course-readiness audit and demo checklist, see
+[`docs/COURSE_TRACEABILITY.md`](docs/COURSE_TRACEABILITY.md). New contributors can
+start with [`docs/TEAM_GITHUB_GUIDE.md`](docs/TEAM_GITHUB_GUIDE.md). The audit is a
+working document until the submitted SRS and team repository are confirmed.
+
+For team practice, select **Show FR debug mode** in the footer. A guide above each
+screen explains relevant M2 SRS v2.0 requirements and known limitations. It stays
+on while navigating and turns off when selected again or the page is reloaded.
+Thin red outlines and FR labels identify related controls and containers, including
+the embedded Discover catalog. The labels help explain the application; they are
+not test results.

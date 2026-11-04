@@ -5,7 +5,7 @@
  * Only exact/strongly matching nearby articles qualify. No guessed image for
  * arbitrary Google Places businesses. Requests are lazy, capped and in-memory.
  */
-import { selectMatchingArticle, plainCredit } from './photo-matching.mjs';
+import { selectMatchingArticle, plainCredit, normalizePhotoName } from './photo-matching.mjs';
 
 const promises = new Map();
 const pending = [];
@@ -37,7 +37,30 @@ async function getJson(host, params) {
   return response.json();
 }
 
-async function lookup(place) {
+async function commonsSearch(place) {
+  const name = String(place.name || '').replace(/\([^)]*\)/g, '').split(' - ')[0].trim();
+  const normalized = normalizePhotoName(name);
+  const province = String(place.administrativeArea || '').replace(/ Province$/, '');
+  if (normalized.length < 8 || normalized.split(' ').length < 2 || !province) return null;
+  const results = await getJson('commons.wikimedia.org', {
+    action: 'query', generator: 'search', gsrsearch: `"${name}" "${province}"`,
+    gsrnamespace: 6, gsrlimit: 8, prop: 'imageinfo', iiprop: 'url|extmetadata', iiurlwidth: 960,
+  });
+  for (const entry of Object.values(results.query?.pages || {})) {
+    const info = entry.imageinfo?.[0], metadata = info?.extmetadata || {};
+    const title = normalizePhotoName(entry.title);
+    const context = normalizePhotoName(`${entry.title} ${plainCredit(metadata.ImageDescription?.value)}`);
+    const licence = plainCredit(metadata.LicenseShortName?.value);
+    const credit = plainCredit(metadata.Artist?.value || metadata.Credit?.value);
+    if (!/\.(jpe?g|png|webp)$/i.test(entry.title) || !title.includes(normalized) ||
+        !context.includes(normalizePhotoName(province)) || !/^(CC[ -]|Public domain|PD)/i.test(licence) ||
+        !credit || !info?.thumburl?.startsWith('https://') || !info.descriptionurl?.startsWith('https://commons.wikimedia.org/')) continue;
+    return { src: info.thumburl, provider: 'Wikimedia Commons', credit, licence, source: info.descriptionurl };
+  }
+  return null;
+}
+
+async function wikipediaLookup(place) {
   if (!Number.isFinite(place?.latitude) || !Number.isFinite(place?.longitude)) return null;
   const nearby = await getJson('en.wikipedia.org', {
     action: 'query', list: 'geosearch',
@@ -73,6 +96,15 @@ async function lookup(place) {
     source: `https://commons.wikimedia.org/wiki/${encodeURIComponent(entry.title.replace(/ /g, '_'))}`,
     article: `https://en.wikipedia.org/wiki/${encodeURIComponent(match.title.replace(/ /g, '_'))}`,
   };
+}
+
+let curatedPhotos;
+async function lookup(place) {
+  curatedPhotos ||= fetch('/data/catalog-photos.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  const curated = (await curatedPhotos)[place.id];
+  if (curated) return curated;
+  try { const photo = await wikipediaLookup(place); if (photo) return photo; } catch { /* Try Commons directly. */ }
+  try { return await commonsSearch(place); } catch { return null; }
 }
 
 export function fetchCommonsPhoto(place) {

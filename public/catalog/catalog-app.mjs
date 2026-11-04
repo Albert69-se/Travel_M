@@ -7,7 +7,7 @@ import {
 
 const $ = id => document.getElementById(id);
 const state = { places: [], ...filtersFromSearch(location.search),
-  visible: 24, selectedId: null, view: 'list', map: null, markers: [], mapReady: false, mapKey: '' };
+  visible: 24, pageSize: 24, selectedId: null, view: 'list', map: null, markers: [], mapReady: false, mapKey: '' };
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, x =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[x])
 );
@@ -257,16 +257,21 @@ function bindEvents() {
   $('back-results').addEventListener('click', closeDetails);
   document.addEventListener('keydown', event => { if (event.key === 'Escape') closeDetails(); });
   $('clear-filters').addEventListener('click', () => {
-    state.query = ''; state.province = 'All'; state.category = 'All'; state.visible = 24;
+    state.query = ''; state.province = 'All'; state.category = 'All'; state.visible = state.pageSize;
     $('query').value = ''; $('province').value = 'All'; $('category').value = 'All';
     renderResults(); $('query').focus();
   });
-  $('query').addEventListener('input', event => { state.query = event.target.value; state.visible = 24; renderResults(); });
+  $('query').addEventListener('input', event => { state.query = event.target.value; state.visible = state.pageSize; renderResults(); });
   for (const id of ['province', 'category']) {
     $(id).addEventListener('change', event => {
-      state[id] = event.target.value; state.visible = 24; renderResults();
+      state[id] = event.target.value; state.visible = state.pageSize; renderResults();
     });
   }
+  $('result-limit').addEventListener('change', event => { state.pageSize = Number(event.target.value); state.visible = state.pageSize; renderResults(); });
+  for (const layout of ['grid', 'list']) $(layout + '-layout').addEventListener('click', () => {
+    $('items').classList.toggle('list-layout', layout === 'list');
+    for (const option of ['grid', 'list']) $(option + '-layout').setAttribute('aria-pressed', String(option === layout));
+  });
   $('show-more').addEventListener('click', () => { state.visible += 24; renderResults(); });
   $('list-mode').addEventListener('click', () => setView('list'));
   $('map-mode').addEventListener('click', () => setView('map'));

@@ -157,3 +157,25 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 420px) { .places { grid-template-columns: 1fr; } }
 html.fr-debug [data-fr] { outline: 1px solid #d63838; outline-offset: -1px; position: relative; padding-top: max(22px, 1rem); }
 html.fr-debug [data-fr]::before { content: attr(data-fr); position: absolute; top: 0; right: 0; z-index: 5; background: #b92323; color: white; padding: 2px 5px; border-radius: 0 0 0 4px; font: 600 10px/1.3 system-ui, sans-serif; pointer-events: none; }
+
+/* Result controls are available before the first card in both layouts. */
+.results-controls { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.results-controls label { font-size:12px; color:#43594c; }
+.results-controls select { min-height:40px; border:1px solid #d1d8cc; border-radius:8px; background:#fffefa; padding:0 8px; }
+.layout-switch { display:flex; padding:3px; border-radius:8px; background:#eeeee6; }
+.layout-switch button { min-height:34px; border:0; padding:0 12px; border-radius:6px; background:transparent; color:#43594c; }
+.layout-switch button[aria-pressed="true"] { background:#24674f; color:white; }
+.places.list-layout, .has-detail .places.list-layout { grid-template-columns:minmax(0,1fr); }
+.list-layout .place-row { flex-direction:row; min-height:120px; }
+.list-layout .place-symbol { width:180px; min-width:180px; height:auto; aspect-ratio:auto; }
+.list-layout .place-body { justify-content:center; padding-right:60px; }
+.list-layout .place-subtitle { margin-top:8px; }
+@media (max-width:720px) {
+  .section-heading { align-items:flex-start; flex-wrap:wrap; }
+  .results-controls { width:100%; }
+  .list-layout .place-row { min-height:105px; }
+  .list-layout .place-symbol { width:110px; min-width:110px; }
+  .list-layout .place-body { padding:12px 50px 12px 12px; }
+  .list-layout .photo-placeholder > span { font-size:24px; }
+  .list-layout .photo-placeholder small { font-size:9px; }
+}

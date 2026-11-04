@@ -51,7 +51,8 @@
     <div id="status" class="status" role="status" aria-live="polite">Loading local catalog…</div>
     <div class="content-layout">
       <section class="listing" aria-label="Matching attractions" data-fr="FR-1 · FR-2">
-        <div class="section-heading"><strong id="result-count">Attractions</strong><span id="category-hint">All places</span></div>
+        <div class="section-heading"><div><strong id="result-count">Attractions</strong> <span id="category-hint">All places</span></div>
+          <div class="results-controls"><label for="result-limit">Show</label><select id="result-limit"><option value="12">12</option><option value="24" selected>24</option><option value="48">48</option><option value="200">All</option></select><div class="layout-switch" role="group" aria-label="Results layout"><button id="grid-layout" type="button" aria-pressed="true">Grid</button><button id="list-layout" type="button" aria-pressed="false">List</button></div></div></div>
         <div id="items" class="places" aria-live="off"></div>
         <button id="show-more" type="button" class="show-more" hidden>Show more places</button>
         <p id="empty" class="empty" hidden>No attractions match. Try different keywords or filters.</p>

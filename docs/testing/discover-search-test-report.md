@@ -52,11 +52,13 @@ and check place details and source information.
 
 ### Issue 01: Some Attraction Images Are Unavailable
 
-![Unavailable attraction images]
+![Unavailable attraction images]<img width="1470" height="840" alt="Screenshot 2569-11-08 at 18 13 45" src="https://github.com/user-attachments/assets/33884d64-d1fe-43b4-bc68-9323b84b0b9b" />
+
 
 ### Issue 02: Visitor Information Not Independently Verified
 
-![Unverified visitor information]
+![Unverified visitor information]<img width="1418" height="840" alt="Screenshot 2569-11-08 at 18 07 32" src="https://github.com/user-attachments/assets/5b4dc860-35dc-4dd7-8ae2-960ad0e22542" />
+
 
 ## 5. Conclusion
 

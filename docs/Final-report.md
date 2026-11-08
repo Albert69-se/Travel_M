@@ -58,7 +58,7 @@ The report does not invent test execution dates, tester names, screenshots, or u
 | Separate notes/calculators can show outdated totals and late warnings. | FR-10 View expense summary and warnings | Budget summary → view totals/category groups → trigger threshold/over-budget warning | FR-10 team test result: Not tested yet ; Pending |
 
 ## 10. Conclusion
-TravelM addresses a fragmented travel-planning problem by combining destination discovery, sourced information, weather context, trip organization, packing preparation, and expense tracking. The team reports that eight out of ten functional requirements passed testing. The repository should include the supporting design, test, and AI-use documentation.
+TravelM addresses a fragmented travel-planning problem by combining destination discovery, sourced information, weather context, trip organization, packing preparation, and expense tracking. The team reports that three functional requirements are not tested yet. The repository should include the supporting design, test, and AI-use documentation.
 
 ## 11. Submission checks
 -  Replace the prototype placeholder with the real prototype URL.

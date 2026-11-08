@@ -7,7 +7,7 @@
 - Related Requirements: FR-1, FR-2, FR-3
 - Status: Planned
 - Tester: SENG RING AUNG
-- Test Date: 7NOV2026
+- Test Date: 8NOV2026
 
 ## 1. Objective
 
@@ -20,24 +20,50 @@ and check place details and source information.
 
 | Test ID | Test Description | Expected Result | Actual Result | Status |
 |---|---|---|---|---|
-| TC-01 | Open attraction list | Attraction list is displayed | Not tested | Pending |
-| TC-02 | Open map view | Map displays attraction locations | Not tested | Pending |
-| TC-03 | Search using keywords | Relevant places are displayed | Not tested | Pending |
-| TC-04 | Filter by province | Places from selected province are displayed | Not tested | Pending |
-| TC-05 | Filter by category | Places from selected category are displayed | Not tested | Pending |
-| TC-06 | Search unavailable keyword | Empty result message is displayed | Not tested | Pending |
-| TC-07 | Open place details | Correct place details are displayed | Not tested | Pending |
-| TC-08 | Check source information | Source information is available | Not tested | Pending |
+| TC-01 | Open attraction list | Attraction list is displayed | The attraction list was displayed successfully with matching attractions in grid view.| Pass |
+| TC-02 | Open map view | Map displays attraction locations | The map was displayed successfully with visible location pins. | Pass |
+| TC-03 | Search using keywords | Relevant places are displayed | Search results appeared after entering the keyword "temple". Relevance still needs verification. | Need verification |
+| TC-04 | Filter by province | Places from selected province are displayed | Places were filtered successfully by the selected province. | Pass |
+| TC-05 | Filter by category | Places from selected category are displayed | Places were filtered successfully by the selected category. | Pass|
+| TC-06 | Search unavailable keyword | Empty result message is displayed | The empty result message was displayed successfully. | Pass |
+| TC-07 | Open place details | Correct place details are displayed | Places display the message "Detailed visitor information has not been independently verified". | Needs improvement |
+| TC-08 | Check source information | Source information is available | Source information was displayed successfully. | Pass |
 
 ## 3. Issues Found
 
-No issues reported yet. Testing is pending.
+### Issue 01: Some Place Images Are Unavailable
+
+- Description: Some attraction cards display place information,
+  but their images are missing or unavailable.
+- Expected Result: Each attraction should display its corresponding image.
+- Actual Result: Place names and information are displayed,
+  but some images are unavailable.
+- Status: Open
+- Severity: Medium
+
+### Issue 02: Visitor Information Not Independently Verified
+
+- Description: Place details display a notice stating that detailed visitor information has not been independently verified.
+- Expected Result: Place details should provide accurate and verified visitor information.
+- Actual Result: Places display an unverified information notice.
+- Status: Open
 
 ## 4. Screenshots
 
-Screenshots will be added after testing.
+### Issue 01: Some Attraction Images Are Unavailable
+
+![Unavailable attraction images]<img width="1470" height="840" alt="Screenshot 2569-11-08 at 18 13 45" src="https://github.com/user-attachments/assets/33884d64-d1fe-43b4-bc68-9323b84b0b9b" />
+
+
+### Issue 02: Visitor Information Not Independently Verified
+
+![Unverified visitor information]<img width="1418" height="840" alt="Screenshot 2569-11-08 at 18 07 32" src="https://github.com/user-attachments/assets/5b4dc860-35dc-4dd7-8ae2-960ad0e22542" />
+
 
 ## 5. Conclusion
 
-Testing has not been completed yet. The results will be updated
-after testing the Discover and Search prototype.
+The initial testing showed that the attraction list, map view, and keyword search are functioning as expected. However, some attraction images are unavailable, and some place details display a notice stating that the visitor information has not been independently verified.
+
+Province filtering, category filtering, empty search results, and source information still require further testing.
+
+Overall, the Discover & Search feature is partially working, but further testing and improvements are required before it can be considered fully verified.

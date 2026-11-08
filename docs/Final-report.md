@@ -23,6 +23,7 @@ Travelers commonly use separate apps, websites, notes, and messages to research 
 - Connect expenses to the correct trip and calculate budget status.
 
 ## 4. Scope
+The original requirements from M1 were expanded and refined from five to ten functional requirements. The additional requirements cover itinerary organization, budget management, packing preparation, expense tracking, and expense summaries.
 The MVP comprises FR-1 to FR-10 in the SRS. Hotel, flight, and restaurant bookings, payments, public reviews/social networking, complex AI recommendations, and real-time transport optimization are excluded.
 
 ## 5. Development approach
@@ -45,10 +46,9 @@ The report does not invent test execution dates, tester names, screenshots, or u
 
 | Problem / user need | Requirement | Design artifact | Prototype page / happy path | Test / result |
 |---|---|---|---|---|
-| Popular places are scattered across platforms. | FR-1 Discover places | `design/FR-1-discover-places.md` | Discover page → select a place/marker → view place preview | Discover & Search test record; C04–C08 reported PASS where applicable; team confirms FR-1 PASS |
-| Users are overwhelmed by too many places. | FR-2 Search and filter places | `design/FR-2-search-filter-places.md` | Discover/Search page → enter keyword → apply location/category filter | Discover & Search test record; C04–C08 reported PASS where applicable; team confirms FR-2 PASS |
-| Place details may be incomplete, outdated, or inaccurate. | FR-3 View accurate and sourced place information | `design/FR-3-place-information.md` | Place details page → inspect details, source, and last-checked status | FR-3 team test result: Needs 
-verification and improvement ; attach executed test evidence |
+| Popular places are scattered across platforms. | FR-1 Discover places | `design/FR-1-discover-places.md` | Discover page → select a place/marker → view place preview | Discover & Search test record; team confirms FR-1 PASS |
+| Users are overwhelmed by too many places. | FR-2 Search and filter places | `design/FR-2-search-filter-places.md` | Discover/Search page → enter keyword → apply location/category filter | Discover & Search test record; team confirms FR-2 PASS |
+| Place details may be incomplete, outdated, or inaccurate. | FR-3 View accurate and sourced place information | `design/FR-3-place-information.md` | Place details page → inspect details, source, and last-checked status | FR-3 team test result: Needs verification and improvement ; attach executed test evidence |
 | Travelers lack destination and date-specific weather information. | FR-4 View weather | `design/FR-4-weather.md` | Weather/destination section → select destination and trip dates → view available weather | FR-4 team test result: PASS; attach executed test evidence |
 | Trip information becomes mixed in general notes. | FR-5 Create and maintain a trip | `design/FR-5-create-maintain-trip.md` | Trips page → create trip → view/edit trip | FR-5 team test result: PASS; attach executed test evidence |
 | A general calculator does not connect spending to a trip. | FR-6 Set a trip budget | `design/FR-6-trip-budget.md` | Trip overview/budget page → enter budget → save → view remaining amount | FR-6 team test result: PASS; attach executed test evidence |

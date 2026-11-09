@@ -9,6 +9,8 @@ Live: <https://travel-m.xcalibur.space>
 
 Team members can find proposed responsibilities and the evidence log in [Team contributions](Team_contribution.md).
 
+Demo slide link: <https://drive.google.com/file/d/1-6ZDjYEqgNQ1pVCYubNkQqnTYk6jZ9N4/view?usp=sharing>
+
 ## Current source changes — 26 October 2026
 
 Source: https://github.com/Albert69-se/Travel_M (student account; React repository renamed on 3 November 2026).
